@@ -1,9 +1,6 @@
-const functions = require("firebase-functions");
+require("./init");
+const {realtime} = require("./zoom/realtime");
+const {log} = require("./zoom/log");
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", {structuredData: true});
-  response.send("Hello from Firebase!");
-});
+exports.zoomLog = log;
+exports.zoomRealtime = realtime;

@@ -12,6 +12,14 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
+        "source": "/zoom/log",
+        "function": "zoomLog"
+      },
+      {
+        "source": "/zoom/realtime",
+        "function": "zoomRealtime"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
