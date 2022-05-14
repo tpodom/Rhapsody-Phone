@@ -1,7 +1,4 @@
-const functions = require("firebase-functions-test");
 const calls = require("./calls");
-
-const testEnv = functions();
 
 describe("webhooks - calls", () => {
   describe("incoming", () => {
