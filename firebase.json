@@ -12,16 +12,20 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/zoom/log",
-        "function": "zoomLog"
+        "source": "/webhooks/calls/incoming",
+        "function": "webhookCallsIncoming"
       },
       {
-        "source": "/zoom/realtime",
-        "function": "zoomRealtime"
+        "source": "/webhooks/calls/answered",
+        "function": "webhookCallsAnswered"
       },
       {
-        "source": "/ringcentral/webhook",
-        "function": "ringcentralWebhook"
+        "source": "/webhooks/calls/missed",
+        "function": "webhookCallsMissed"
+      },
+      {
+        "source": "/webhooks/sms",
+        "function": "webhookSMS"
       },
       {
         "source": "**",
