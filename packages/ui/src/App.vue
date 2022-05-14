@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <v-main>
-    <call-list />
-     </v-main>
+      <call-list />
+    </v-main>
   </v-app>
 </template>
 

@@ -7,12 +7,17 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "format": "prettier --write ."
+    "build": "npm run build --workspaces --if-present",
+    "format": "prettier --write .",
+    "test:components": "npm run test:components --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspaces --if-present"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
+    "eslint-config-prettier": "^8.5.0",
+    "jest": "^28.1.0",
     "prettier": "^2.6.2"
   }
 }

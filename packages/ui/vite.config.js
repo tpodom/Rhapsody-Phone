@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "@vuetify/vite-plugin";
+import vueJsx from "@vitejs/plugin-vue-jsx";
 
 const path = require("path");
 
@@ -12,6 +13,7 @@ export default defineConfig({
     vuetify({
       autoImport: true,
     }),
+    vueJsx({ optimize: false, enableObjectSlots: true }),
   ],
   define: { "process.env": {} },
   resolve: {

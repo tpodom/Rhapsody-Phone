@@ -1,6 +1,8 @@
 require("./init");
-const {realtime} = require("./zoom/realtime");
-const {log} = require("./zoom/log");
+const calls = require("./webhooks/calls");
+const { sms } = require("./webhooks/sms");
 
-exports.zoomLog = log;
-exports.zoomRealtime = realtime;
+exports.webhookCallsIncoming = calls.incoming;
+exports.webhookCallsAnswered = calls.answered;
+exports.webhookCallsMissed = calls.missed;
+exports.webhookSMS = sms;

@@ -1,5 +1,5 @@
 <template>
-  <v-table>
+  <v-table class="call-list">
     <thead>
       <tr>
         <th></th>
@@ -26,8 +26,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // reactive state
-const calls = ref([])
+const calls = ref([]);
 </script>

@@ -20,6 +20,10 @@
         "function": "zoomRealtime"
       },
       {
+        "source": "/ringcentral/webhook",
+        "function": "ringcentralWebhook"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
