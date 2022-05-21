@@ -1,4 +1,4 @@
-import { firebaseAuth, signInWithPopup } from "../composables/firebase/auth";
+import { firebaseAuth, signInWithPopup } from "../lib/firebase/auth";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 

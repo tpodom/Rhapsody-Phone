@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { firestore } from "../composables/firebase/firestore";
+import { firestore } from "../lib/firebase/firestore";
 import { collection } from "firebase/firestore";
 
 type Call = {
