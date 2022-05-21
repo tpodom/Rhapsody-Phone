@@ -1,5 +1,6 @@
 import { mount as cyMount } from "@cypress/vue";
 import { createVuetify } from "vuetify";
+import { createTestingPinia } from "@pinia/testing";
 
 function isObject(obj) {
   return obj !== null && typeof obj === "object" && !Array.isArray(obj);
@@ -59,7 +60,14 @@ Cypress.Commands.add("mount", (component, options, vuetifyOptions) => {
         transition: false,
         "transition-group": false,
       },
-      plugins: [vuetify],
+      plugins: [
+        vuetify,
+        createTestingPinia({
+          createSpy(fn) {
+            cy.stub().returns(fn ? fn() : undefined);
+          },
+        }),
+      ],
     },
   };
 

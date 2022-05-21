@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "@vuetify/vite-plugin";
@@ -19,6 +21,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+    },
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    deps: {
+      external: [],
     },
   },
   /* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions

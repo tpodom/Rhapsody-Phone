@@ -1,3 +1,4 @@
+require("../init");
 const functions = require("firebase-functions");
 // const { doc, setDoc, getDoc } = require("firebase-admin/firestore");
 

@@ -12,12 +12,16 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/webhooks/calls/incoming",
-        "function": "webhookCallsIncoming"
+        "source": "/goto/register",
+        "function": "gotoRegister"
       },
       {
-        "source": "/webhooks/calls/answered",
-        "function": "webhookCallsAnswered"
+        "source": "/goto/callback",
+        "function": "gotoCallback"
+      },
+      {
+        "source": "/webhooks/calls/incoming",
+        "function": "webhookCallsIncoming"
       },
       {
         "source": "/webhooks/calls/missed",
