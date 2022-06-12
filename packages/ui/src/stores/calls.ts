@@ -1,31 +1,35 @@
 import { defineStore } from "pinia";
 import { firestore } from "../lib/firebase/firestore";
-import { collection } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  CollectionReference,
+  Timestamp,
+} from "firebase/firestore";
+import { computed, Ref } from "vue";
+import { useFirestore } from "../composables/firestore";
 
-type Call = {
+export interface Call {
   id: string;
-  phoneNumber: string;
-  callerName: string;
-};
+  state: string;
+  startTime: Timestamp;
+  endTime: Timestamp | null;
+  caller: {
+    phoneNumber: string;
+    name: string;
+  };
+  rhapsodyClientId: string | undefined;
+}
 
-export type State = {
-  calls: Call[] | null;
-};
+export const useCallsStore = defineStore("calls", () => {
+  const callQueueRef = collection(firestore, "call_queue") as CollectionReference<Call>;
+  const callsQuery = query(callQueueRef, orderBy("startTime", "desc"), limit(20));
+  const calls = useFirestore<Call>(callsQuery);
 
-export const useCallsStore = defineStore("calls", {
-  state: (): State => {
-    return {
-      calls: null,
-    };
-  },
-  actions: {
-    async setup() {
-      console.log("store setup");
-      const collectionRef = collection(firestore, "CallQueue");
-      this.sync("calls", collectionRef);
-    },
-  },
-  getters: {
-    loading: (state) => state.calls === null,
-  },
+  // The doc will start out as undefined initially and will resolve as null or an object
+  const loading = computed(() => calls.value === undefined);
+
+  return { calls, loading };
 });

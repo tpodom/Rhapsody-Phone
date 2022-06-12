@@ -6,11 +6,35 @@ name: Deploy to Firebase Hosting on merge
   push:
     branches:
       - main
+      - atriumcat
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set env vars (dev)
+        if: endsWith(github.ref, '/main')
+        run: |
+          echo "FIREBASE_PROJECT_ID=rhapsody-connect-dev" >> $GITHUB_ENV
+          echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_DEV" >> $GITHUB_ENV
+          echo "FIREBASE_CONFIG_SECRET_PREFIX=FIREBASE_CONFIG_DEV" >> $GITHUB_ENV
+      - name: Set env vars (atrium cat)
+        if: endsWith(github.ref, '/atriumcat')
+        run: |
+          echo "FIREBASE_PROJECT_ID=rhapsody-connect-atriumcat" >> $GITHUB_ENV
+          echo "FIREBASE_CONFIG_SECRET_PREFIX=FIREBASE_CONFIG_ATRIUMCAT" >> $GITHUB_ENV
+          echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_ATRIUMCAT" >> $GITHUB_ENV
+      - name: Set UI env vars
+        run: |
+          echo "VITE_FIREBASE_API_KEY=${{ secrets[format('{0}_API_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets[format('{0}_AUTH_DOMAIN', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_FIREBASE_PROJECT_ID=${{ secrets[format('{0}_PROJECT_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=${{ secrets[format('{0}_STORAGE_BUCKET', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets[format('{0}_MESSAGING_SENDER_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_FIREBASE_APP_ID=${{ secrets[format('{0}_APP_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_FIREBASE_MEASUREMENT_ID=${{ secrets[format('{0}_MEASUREMENT_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_APP_CHECK_SITE_KEY=${{ secrets[format('{0}_APP_CHECK_SITE_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+
       - run: npm ci
       - run: npm run build
       - run: npm run test:unit
@@ -22,6 +46,6 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_RHAPSODY_PHONE }}"
+          firebaseServiceAccount: "${{ secrets[env.FIREBASE_SERVICE_ACCOUNT_SECRET] }}"
           channelId: live
-          projectId: rhapsody-phone
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}

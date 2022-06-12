@@ -12,24 +12,12 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/goto/register",
-        "function": "gotoRegister"
-      },
-      {
         "source": "/goto/callback",
         "function": "gotoCallback"
       },
       {
-        "source": "/webhooks/calls/incoming",
-        "function": "webhookCallsIncoming"
-      },
-      {
-        "source": "/webhooks/calls/missed",
-        "function": "webhookCallsMissed"
-      },
-      {
-        "source": "/webhooks/sms",
-        "function": "webhookSMS"
+        "source": "/webhooks",
+        "function": "webhooks"
       },
       {
         "source": "**",

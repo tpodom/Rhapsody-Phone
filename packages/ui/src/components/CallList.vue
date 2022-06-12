@@ -12,21 +12,14 @@
     </thead>
     <tbody>
       <tr v-if="callsStore.loading">
-        <td colspan="5">
-          <v-progress-circular indeterminate color="primary" /> Loading...
-        </td>
+        <td colspan="5"><v-progress-circular indeterminate color="primary" /> Loading...</td>
       </tr>
-      <tr
-        v-else-if="callsStore.calls.length"
+      <Call
+        v-else-if="callsStore.calls?.length"
         v-for="item in callsStore.calls"
         :key="item.id"
-      >
-        <td>{{ item.caller }}</td>
-        <td></td>
-        <td>{{ item.phoneNumber }}</td>
-        <td></td>
-        <td></td>
-      </tr>
+        :call="item"
+      />
       <tr v-else>
         <td colspan="5">No calls have been received.</td>
       </tr>
@@ -34,12 +27,9 @@
   </v-table>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { storeToRefs } from "pinia";
+<script setup lang="ts">
+import Call from "./Call.vue";
 import { useCallsStore } from "../stores/calls";
 
-// reactive state
 const callsStore = useCallsStore();
-callsStore.setup();
 </script>

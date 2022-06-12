@@ -1,6 +1,6 @@
-import { firebaseAuth, signInWithPopup } from "../lib/firebase/auth";
+import { firebaseAuth, signInWithPopup, User } from "../lib/firebase/auth";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, Ref } from "vue";
 
 type Auth = {
   loggedIn: boolean;
@@ -12,14 +12,22 @@ export type State = {
 };
 
 export const useAuthStore = defineStore("auth", () => {
-  const loggedIn = ref(false);
-  const initialized = ref(false);
-  const user = ref(null);
-  const authError = ref(null);
+  const loggedIn: Ref<boolean> = ref(false);
+  const initialized: Ref<boolean> = ref(false);
+  const user: Ref<User | null> = ref(null);
+  const isAdmin: Ref<boolean> = ref(false);
 
-  firebaseAuth.onAuthStateChanged((u) => {
+  firebaseAuth.onAuthStateChanged(async (u) => {
     user.value = u;
     loggedIn.value = !!u;
+
+    if (u) {
+      const token = await u.getIdTokenResult();
+      isAdmin.value = !!token?.claims?.admin;
+    } else {
+      isAdmin.value = false;
+    }
+
     initialized.value = true;
   });
 
@@ -27,5 +35,5 @@ export const useAuthStore = defineStore("auth", () => {
     return signInWithPopup();
   }
 
-  return { authenticate, loggedIn, initialized, user };
+  return { authenticate, loggedIn, initialized, user, isAdmin };
 });

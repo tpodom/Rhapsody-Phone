@@ -3,8 +3,7 @@
     <v-col>
       <v-card class="mx-auto" max-width="344" variant="outlined">
         <v-card-text
-          >This site requires authentication. Please click Log In to to
-          proceed.</v-card-text
+          >This site requires authentication. Please click Log In to to proceed.</v-card-text
         >
         <v-card-actions>
           <v-btn :loading="authenticating" @click="authenticate">Log In</v-btn>
@@ -14,13 +13,13 @@
   </v-row>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, Ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 
 const authenticating = ref(false);
-const error = ref(null);
+const error: Ref<string | null> = ref(null);
 const authStore = useAuthStore();
 const router = useRouter();
 
@@ -33,8 +32,8 @@ async function authenticate() {
     } else {
       error.value = "Authentication failed";
     }
-  } catch (error) {
-    error.value = error.message;
+  } catch (err) {
+    error.value = (err as Error).message;
   }
 }
 </script>

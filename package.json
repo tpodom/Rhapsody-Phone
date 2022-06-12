@@ -1,7 +1,7 @@
 {
-  "name": "@rhapsody-phone/root",
+  "name": "@rhapsody-connect/root",
   "version": "0.1.0",
-  "description": "Rhapsody Zoom phone integration",
+  "description": "Rhapsody Connect",
   "repository": "https://github.com/tpodom/Rhapsody-Phone.git",
   "author": "Tommy Odom <tommy.odom@gmail.com>",
   "license": "MIT",
@@ -19,5 +19,8 @@
     "eslint-config-prettier": "^8.5.0",
     "jest": "^28.1.0",
     "prettier": "^2.6.2"
+  },
+  "volta": {
+    "node": "16.15.0"
   }
 }

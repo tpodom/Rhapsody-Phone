@@ -1,18 +1,22 @@
-import {
-  createWebHistory,
-  createRouter,
-  RouteRecordNormalized,
-} from "vue-router";
+import { createWebHistory, createRouter, RouteRecordNormalized } from "vue-router";
 import { watch } from "vue";
 import CallList from "../components/CallList.vue";
 import Login from "../components/Login.vue";
+import Settings from "../components/Settings.vue";
 import { useAuthStore } from "../stores/auth";
+import { useSnackbarStore } from "../stores/snackbar";
 
 const routes = [
   {
     path: "/",
     name: "CallList",
     component: CallList,
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    component: Settings,
+    meta: { admin: true },
   },
   {
     path: "/login",
@@ -29,11 +33,14 @@ const router = createRouter({
 
 router.beforeEach((to, _, next) => {
   const authStore = useAuthStore();
+  const snackbar = useSnackbarStore();
+
   function checkAuth() {
-    if (
-      !to.matched.some((record) => record.meta.public) &&
-      !authStore.loggedIn
-    ) {
+    if (to.matched.some((record) => record.meta.admin) && !authStore.isAdmin) {
+      snackbar.showError("Not authorized.");
+      return next("/");
+    }
+    if (!to.matched.some((record) => record.meta.public) && !authStore.loggedIn) {
       return next("/login");
     }
 
@@ -49,7 +56,7 @@ router.beforeEach((to, _, next) => {
         if (initialized) {
           checkAuth();
         }
-      }
+      },
     );
   }
 });

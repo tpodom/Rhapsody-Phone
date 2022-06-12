@@ -1,4 +1,8 @@
 import { firebaseApp } from "./app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 export const firestore = getFirestore(firebaseApp);
+
+if (!!import.meta.env.VITE_FIREBASE_EMULATOR) {
+  connectFirestoreEmulator(firestore, "localhost", 8080);
+}
