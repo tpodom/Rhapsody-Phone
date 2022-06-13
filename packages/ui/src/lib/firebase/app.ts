@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported, Analytics } from "firebase/analytics";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
 // Your web app's Firebase configuration
@@ -16,7 +16,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const firebaseApp = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(firebaseApp);
+export let analytics: Analytics | undefined;
+
+if (await isSupported()) {
+  analytics = getAnalytics(firebaseApp);
+} else {
+  analytics = undefined;
+}
+
 initializeAppCheck(firebaseApp, {
   provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_APP_CHECK_SITE_KEY),
   isTokenAutoRefreshEnabled: true,

@@ -9,8 +9,7 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "test:components": "cypress run-ct --headless",
-    "test:unit": "vitest"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -28,8 +27,6 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@cypress/vite-dev-server": "^2.2.3",
-    "@cypress/vue": "^3.1.2",
     "@pinia/testing": "^0.0.12",
     "@types/webfontloader": "^1.6.34",
     "@vitejs/plugin-vue": "^2.3.0",
@@ -38,6 +35,7 @@
     "@vuetify/vite-plugin": "^1.0.0-alpha.0",
     "cypress": "^9.6.1",
     "jsdom": "^19.0.0",
+    "node-fetch": "^3.2.6",
     "resize-observer-polyfill": "^1.5.1",
     "sass": "^1.38.0",
     "sass-loader": "^10.0.0",

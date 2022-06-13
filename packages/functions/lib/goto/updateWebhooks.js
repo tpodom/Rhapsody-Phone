@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const { logger } = require("../init");
 const { createClient } = require("./client");
 const { AuthenticationError } = require("../errors");
 const settings = require("../db/gotoSettings");
@@ -13,7 +13,7 @@ async function updateWebhooks() {
   const gotoSettings = await settings.getSettings();
 
   if (!gotoSettings?.accountKey) {
-    functions.logger.info("Skipping update, GoTo Connect is not configured.");
+    logger.info("Skipping update, GoTo Connect is not configured.");
     return;
   }
 
@@ -51,7 +51,7 @@ async function prepareChannel(client, gotoSettings) {
     const channelExists = await client.doesChannelExist(CHANNEL_NAME, channelId);
 
     if (!channelExists) {
-      functions.logger.info(`Channel ${CHANNEL_NAME} with id ${channelId} no longer exists.`);
+      logger.info(`Channel ${CHANNEL_NAME} with id ${channelId} no longer exists.`);
       await settings.updateChannelId(null);
       channelId = null;
     }
@@ -59,18 +59,18 @@ async function prepareChannel(client, gotoSettings) {
 
   // If so, refresh it. If not, create a channel.
   if (channelId) {
-    functions.logger.info(`Updating the lifetime for channel ${CHANNEL_NAME} with id ${channelId}`);
+    logger.info(`Updating the lifetime for channel ${CHANNEL_NAME} with id ${channelId}`);
 
     await client.updateChannelLifetime(CHANNEL_NAME, gotoSettings?.channelId);
   } else {
-    functions.logger.info(`Creating new channel ${CHANNEL_NAME}`);
+    logger.info(`Creating new channel ${CHANNEL_NAME}`);
     channelId = await client.createChannel(CHANNEL_NAME, process.env.GOTO_WEBHOOK_SECRET);
 
     if (!channelId) {
       throw new Error(`Error creating new channel ${CHANNEL_NAME}, no channel id returned.`);
     }
 
-    functions.logger.info(`Created new channel ${CHANNEL_NAME} with id ${channelId}`);
+    logger.info(`Created new channel ${CHANNEL_NAME} with id ${channelId}`);
     await settings.updateChannelId(channelId);
   }
 
@@ -95,7 +95,7 @@ async function prepareSessionForsubscriptions(client, gotoSettings, channelId) {
     const sessionExists = await client.doesUrlExist(sessionUrl);
 
     if (!sessionExists) {
-      functions.logger.info(`Session ${sessionUrl} no longer exists.`);
+      logger.info(`Session ${sessionUrl} no longer exists.`);
 
       await settings.updateSessionUrls(null, null);
       sessionUrl = null;
@@ -104,14 +104,14 @@ async function prepareSessionForsubscriptions(client, gotoSettings, channelId) {
 
   // If no session for the channel, create one
   if (!sessionUrl) {
-    functions.logger.info(`Creating new session for channel ${channelId}`);
+    logger.info(`Creating new session for channel ${channelId}`);
     const urls = await client.createSession(channelId);
 
     if (!urls?.sessionUrl) {
       throw new Error(`Error creating new session for channel ${channelId}.`);
     }
 
-    functions.logger.info(`Created new session ${urls.sessionUrl}`);
+    logger.info(`Created new session ${urls.sessionUrl}`);
     await settings.updateSessionUrls(urls.sessionUrl, urls.subscriptionsUrl);
     subscriptionsUrl = urls.subscriptionsUrl;
   }
@@ -130,7 +130,7 @@ async function subscribeLines(client, gotoSettings, subscriptionsUrl) {
   const users = await client.listUsers(gotoSettings?.accountKey);
   const lines = users.map((user) => user.lines).flat();
   const subscriptionResult = await client.subscribeLines(subscriptionsUrl, lines);
-  functions.logger.info("Call subscription results", subscriptionResult, { structuredData: true });
+  logger.info("Call subscription results", subscriptionResult, { structuredData: true });
 }
 
 /**
@@ -144,7 +144,7 @@ async function subscribeSMS(client, channelId) {
   const subscribed = subscriptions.some((sub) => sub.ownerPhoneNumber === config.mainPhoneNumber);
 
   if (subscribed) {
-    functions.logger.info("SMS subscription exists, skipping.");
+    logger.info("SMS subscription exists, skipping.");
     return;
   }
 
@@ -152,7 +152,7 @@ async function subscribeSMS(client, channelId) {
     "INCOMING_MESSAGE",
     "OUTGOING_MESSAGE",
   ]);
-  functions.logger.info("SMS subscription results", result);
+  logger.info("SMS subscription results", result);
 }
 
 exports.updateWebhooks = updateWebhooks;

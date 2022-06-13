@@ -1,4 +1,4 @@
-require("../lib/init");
+const { logger } = require("../lib/init");
 const functions = require("firebase-functions");
 const oauth = require("../lib/goto/oauth");
 const { createClient } = require("../lib/goto/client");
@@ -17,12 +17,12 @@ exports.callback = functions
 
     try {
       const tokens = await oauth.connectApp(request.query.code, request.query.state);
-      functions.logger.info(tokens, { structuredData: true });
+      logger.info(tokens, { structuredData: true });
 
       const client = await createClient();
       const account = await client.getAccount();
       const updatedSettings = await settings.updateAccount(account);
-      functions.logger.info(updatedSettings, { structuredData: true });
+      logger.info(updatedSettings, { structuredData: true });
 
       response.status(200).send(`
       <html>
@@ -33,7 +33,7 @@ exports.callback = functions
       </html>
       `);
     } catch (err) {
-      functions.logger.error(`Error connecting the GoTo Connect client: ${err.message}`, err);
+      logger.error(`Error connecting the GoTo Connect client: ${err.message}`, err);
       response.status(500).send(`
       <html>
       <body>

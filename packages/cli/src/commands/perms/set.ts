@@ -1,6 +1,6 @@
 import { Command, Flags } from "@oclif/core";
 import admin from "firebase-admin";
-import fs from "fs";
+import fs from "node:fs";
 
 export default class SetPermissions extends Command {
   static description = "Adds a user's permissions.";
@@ -54,7 +54,7 @@ admin added to user@email.com.
 
     await app.auth().setCustomUserClaims(user.uid, permissions);
 
-    const updated = await app.auth().getUserByEmail(args.email);
+    await app.auth().getUserByEmail(args.email);
     this.log(`Configured ${args.email} with permissions ${flags.permission.join(", ")}`);
   }
 }

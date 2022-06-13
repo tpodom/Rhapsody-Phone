@@ -9,8 +9,7 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "format": "prettier --write .",
-    "test:components": "npm run test:components --workspaces --if-present",
-    "test:unit": "npm run test:unit --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present"
   },
   "workspaces": [
     "packages/*"

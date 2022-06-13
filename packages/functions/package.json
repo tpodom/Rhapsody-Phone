@@ -5,7 +5,7 @@
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "build": "npm run lint",
-    "test:unit": "jest",
+    "test": "jest",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",

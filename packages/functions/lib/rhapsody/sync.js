@@ -5,7 +5,7 @@ const {
   updateLastSyncTime,
 } = require("../../lib/db/rhapsodySettings");
 const clientsStore = require("../db/clients");
-const functions = require("firebase-functions");
+const { logger } = require("../init");
 
 const IGNORED_APPOINTMENT_TYPES = ["OTC Sale"];
 
@@ -33,7 +33,7 @@ exports.sync = async (apiKey) => {
 
     await updateLastSyncTime(lastSyncTime);
   } catch (error) {
-    functions.logger.error("Rhapsody sync failed", error);
+    logger.error("Rhapsody sync failed", error);
   }
 };
 
@@ -50,12 +50,12 @@ async function syncClients(client, settings) {
   );
   for (const clientRecord of clients) {
     try {
-      functions.logger.debug(
+      logger.debug(
         `Syncing client ${clientRecord.id} - ${clientRecord.lastName}, ${clientRecord.firstName}`,
       );
       await clientsStore.upsertClient(clientRecord);
     } catch (error) {
-      functions.logger.error(
+      logger.error(
         `Failed to sync client ${clientRecord.id} - ${clientRecord.lastName}, ${clientRecord.firstName}: ${error.message}`,
       );
     }
@@ -77,24 +77,24 @@ async function syncAppointments(client, settings) {
   for (const appointment of appointments) {
     try {
       if (IGNORED_APPOINTMENT_TYPES.includes(appointment.type?.name)) {
-        functions.logger.debug(
+        logger.debug(
           `Skipping ${appointment.type.name} appointment for client ${appointment.clientId} at ${appointment.scheduledStartDatetime}`,
         );
         continue;
       }
-      functions.logger.debug(
+      logger.debug(
         `Found appointment ${appointment.id} for client ${appointment.clientId} at ${appointment.scheduledStartDatetime}`,
       );
       let clientRecord = await clientsStore.getClient(appointment.clientId);
       if (!clientRecord) {
-        functions.logger.info(`Client ${appointment.clientId} was not found, syncing them now.`);
+        logger.info(`Client ${appointment.clientId} was not found, syncing them now.`);
         clientRecord = await client.getClient(appointment.clientId);
         clientRecord = await clientsStore.upsertClient(clientRecord);
       }
 
       let petRecord = await clientsStore.getPet(appointment.clientId, appointment.patientId);
       if (!petRecord) {
-        functions.logger.info(
+        logger.info(
           `Pet ${appointment.patientId} for client ${appointment.clientId} was not found, syncing them now.`,
         );
         petRecord = await client.getPet(appointment.patientId);
@@ -103,7 +103,7 @@ async function syncAppointments(client, settings) {
 
       await clientsStore.upsertAppointment(appointment.clientId, appointment);
     } catch (error) {
-      functions.logger.error(
+      logger.error(
         `Failed to sync appointment ${appointment.id} - ${appointment.scheduledStartDatetime}: ${error.message}`,
       );
     }

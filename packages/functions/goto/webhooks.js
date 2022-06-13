@@ -1,4 +1,4 @@
-require("../lib/init");
+const { logger } = require("../lib/init");
 const functions = require("firebase-functions");
 const crypto = require("crypto");
 const webhooksStore = require("../lib/db/webhooks");
@@ -8,7 +8,7 @@ const { createExpressRequest } = require("../lib/express");
 const expressApp = createExpressRequest();
 
 expressApp.post("/incoming", async (request, response) => {
-  functions.logger.info(request.body, { structuredData: true });
+  logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
 
   if (!(await webhooksStore.eventExists(webhooksStore.eventTypes.call, eventId))) {
@@ -23,7 +23,7 @@ expressApp.post("/incoming", async (request, response) => {
 });
 
 expressApp.post("/missed", async (request, response) => {
-  functions.logger.info(request.body, { structuredData: true });
+  logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
 
   if (!(await webhooksStore.eventExists(webhooksStore.eventTypes.call, eventId))) {
@@ -38,7 +38,7 @@ expressApp.post("/missed", async (request, response) => {
 });
 
 expressApp.post("/subscription", async (request, response) => {
-  functions.logger.info(request.body, { structuredData: true });
+  logger.info(request.body, { structuredData: true });
 
   // Check to see if we already processed this event
 
@@ -72,7 +72,7 @@ expressApp.post("/subscription", async (request, response) => {
       });
     }
   } else {
-    functions.logger.warn(`Received unexpected webhooks source ${request.body.source}`);
+    logger.warn(`Received unexpected webhooks source ${request.body.source}`);
   }
 
   response.sendStatus(202);

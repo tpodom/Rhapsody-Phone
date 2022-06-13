@@ -4,3 +4,4 @@ const { getFirestore } = require("firebase-admin/firestore");
 
 exports.app = initializeApp(functions.config().firebase);
 exports.db = getFirestore();
+exports.logger = functions.logger;

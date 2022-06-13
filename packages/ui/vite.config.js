@@ -24,7 +24,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: "test/setup/vuetify.js",
+    setupFiles: ["test/setup/fetch.js", "test/setup/vuetify.js"],
     deps: {
       inline: ["vuetify"],
     },

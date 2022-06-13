@@ -1,5 +1,5 @@
+const { logger } = require("../init");
 const { AuthorizationCode } = require("simple-oauth2");
-const functions = require("firebase-functions");
 const crypto = require("crypto");
 const config = require("../config");
 const accessTokenStore = require("../db/accessToken");
@@ -16,7 +16,7 @@ exports.buildAuthorizationUrl = async () => {
   const client = new AuthorizationCode(oauthConfig);
   const state = crypto.randomUUID();
   const result = await accessTokenStore.update(GOTO_CONNECT_SERVICE_NAME, { state });
-  functions.logger.log("Stored state ", result);
+  logger.log("Stored state ", result);
   return client.authorizeURL({
     redirect_uri: createRedirectUri(),
     state,
@@ -34,7 +34,7 @@ exports.buildAuthorizationUrl = async () => {
 exports.connectApp = async (authCode, state) => {
   const accessTokenSnapshot = await accessTokenStore.get(GOTO_CONNECT_SERVICE_NAME);
   const storedState = accessTokenSnapshot.exists ? accessTokenSnapshot.data()?.state : null;
-  functions.logger.log(`Stored state value: ${storedState}, state value: ${state}`);
+  logger.log(`Stored state value: ${storedState}, state value: ${state}`);
 
   if (storedState !== state) {
     throw new Error("Invalid state");
@@ -66,7 +66,7 @@ exports.disconnectApp = async () => {
       await accessToken.revokeAll();
     } catch (error) {
       // warn and continue with deleting our copy
-      functions.logger.warn(`Error revoking tokens: ${error.message}`, error, {
+      logger.warn(`Error revoking tokens: ${error.message}`, error, {
         structuredData: true,
       });
     }
@@ -93,7 +93,7 @@ exports.loadAccessToken = async () => {
       try {
         return await accessToken.refresh();
       } catch (error) {
-        functions.logger.error(
+        logger.error(
           `Error refreshing GoTo Connect access token, deleting tokens: ${error.message}`,
           {
             structuredData: true,

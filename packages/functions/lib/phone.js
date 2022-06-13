@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const { logger } = require("./init");
 
 const { PhoneNumberFormat, PhoneNumberUtil } = require("google-libphonenumber");
 const phoneUtil = PhoneNumberUtil.getInstance();
@@ -14,7 +14,7 @@ exports.parseNumber = (number) => {
     const parsedNumber = phoneUtil.parse(number, "US");
     return phoneUtil.format(parsedNumber, PhoneNumberFormat.E164);
   } catch (error) {
-    functions.logger.debug(`Failed to parse phone number ${number}`, error);
+    logger.debug(`Failed to parse phone number ${number}`, error);
   }
   return number;
 };
