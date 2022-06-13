@@ -16,6 +16,9 @@ export default defineConfig({
     vueJsx({ optimize: false, enableObjectSlots: true }),
   ],
   define: { "process.env": {} },
+  build: {
+    target: "es2020",
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

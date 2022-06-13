@@ -16,13 +16,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const firebaseApp = initializeApp(firebaseConfig);
-export let analytics: Analytics | undefined;
 
-if (await isSupported()) {
-  analytics = getAnalytics(firebaseApp);
-} else {
-  analytics = undefined;
-}
+(async () => {
+  if (await isSupported()) {
+    getAnalytics(firebaseApp);
+  }
+})();
 
 initializeAppCheck(firebaseApp, {
   provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_APP_CHECK_SITE_KEY),
