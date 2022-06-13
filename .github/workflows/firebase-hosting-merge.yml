@@ -26,6 +26,7 @@ jobs:
           echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_ATRIUMCAT" >> $GITHUB_ENV
       - name: Set UI env vars
         run: |
+          echo "" >> packages/ui/.env
           echo "VITE_FIREBASE_API_KEY=${{ secrets[format('{0}_API_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
           echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets[format('{0}_AUTH_DOMAIN', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
           echo "VITE_FIREBASE_PROJECT_ID=${{ secrets[format('{0}_PROJECT_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
