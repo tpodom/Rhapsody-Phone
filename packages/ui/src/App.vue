@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar color="primary">Atrium Cat Hospital - Call Queue</v-app-bar>
+    <v-app-bar color="primary">Rhapsody Connect - Call Queue</v-app-bar>
     <v-main>
       <v-container fluid>
         <div v-if="loading"><v-progress-circular indeterminate color="primary" /> Loading...</div>

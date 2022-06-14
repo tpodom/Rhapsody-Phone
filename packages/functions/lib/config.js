@@ -1,5 +1,5 @@
 const config = {
-  baseUrl: process.env.BASE_URL || "https://atriumcat.odom.dev",
+  baseUrl: process.env.BASE_URL,
   emulator: process.env.FUNCTIONS_EMULATOR === "true",
   mainPhoneNumber: process.env.MAIN_PHONE_NUMBER,
   gotoConnect: {

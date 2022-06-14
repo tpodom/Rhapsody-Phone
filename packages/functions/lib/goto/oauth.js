@@ -134,9 +134,12 @@ function createConfig() {
  * @return {string} redirect URL for our auth callback
  */
 function createRedirectUri() {
+  if (config.emulator) {
+    logger.debug(process.env);
+  }
   const uri = config.emulator
     ? "http://localhost:5001/rhapsody-connect-dev/us-central1/handleAuthCallback"
-    : "https://atriumcat.odom.dev/goto/callback";
+    : `${config.baseUrl}/goto/callback`;
   return uri;
 }
 

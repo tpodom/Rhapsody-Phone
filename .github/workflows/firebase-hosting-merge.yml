@@ -36,6 +36,12 @@ jobs:
           echo "VITE_FIREBASE_MEASUREMENT_ID=${{ secrets[format('{0}_MEASUREMENT_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
           echo "VITE_APP_CHECK_SITE_KEY=${{ secrets[format('{0}_APP_CHECK_SITE_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
           cat ./packages/ui/.env
+      - name: Set functions env vars
+        run: |
+          echo "" >> packages/functions/.env
+          echo "BASE_URL=${{ secrets[format('{0}_BASE_URL', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/functions/.env
+          echo "MAIN_PHONE_NUMBER=${{ secrets[format('{0}_MAIN_PHONE_NUMBER', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/functions/.env
+          cat ./packages/functions/.env
       - run: npm ci
       - run: npm run build
       - run: npm run test
