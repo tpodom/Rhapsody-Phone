@@ -134,9 +134,7 @@ function createConfig() {
  * @return {string} redirect URL for our auth callback
  */
 function createRedirectUri() {
-  if (config.emulator) {
-    logger.debug(process.env);
-  }
+  logger.debug("Config: ", config);
   const uri = config.emulator
     ? "http://localhost:5001/rhapsody-connect-dev/us-central1/handleAuthCallback"
     : `${config.baseUrl}/goto/callback`;
