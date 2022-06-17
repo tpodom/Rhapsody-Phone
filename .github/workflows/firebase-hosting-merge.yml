@@ -45,9 +45,10 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run test
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
         with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets[env.FIREBASE_SERVICE_ACCOUNT_SECRET] }}"
-          channelId: live
+          args: deploy
+        env:
+          FIREBASE_TOKEN: ${{ secrets[env.FIREBASE_SERVICE_ACCOUNT_SECRET] }}
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
