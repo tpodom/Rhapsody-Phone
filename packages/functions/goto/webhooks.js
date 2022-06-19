@@ -44,7 +44,7 @@ router.post("/missed", async (request, response) => {
   webhooksStore.saveEvent(
     webhooksStore.eventTypes.call,
     eventId,
-    mapNotifyToEvent(request.body, "HUNGUP"),
+    mapNotifyToEvent(request.body, "ENDED"),
   );
 
   response.sendStatus(202);

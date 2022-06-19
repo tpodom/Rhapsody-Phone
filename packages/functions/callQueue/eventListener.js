@@ -4,7 +4,7 @@ const { hangup } = require("./handlers/hangup");
 
 const handlers = {
   CREATED: created,
-  HANGUP: hangup,
+  ENDED: hangup,
 };
 
 exports.callQueueListener = functions.firestore
