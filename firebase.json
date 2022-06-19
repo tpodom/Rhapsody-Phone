@@ -12,10 +12,6 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/goto/callback",
-        "function": "gotoCallback"
-      },
-      {
         "source": "/webhooks",
         "function": "webhooks"
       },

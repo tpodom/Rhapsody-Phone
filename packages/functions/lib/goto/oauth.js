@@ -135,10 +135,7 @@ function createConfig() {
  */
 function createRedirectUri() {
   logger.debug("Config: ", config);
-  const uri = config.emulator
-    ? "http://localhost:5001/rhapsody-connect-dev/us-central1/handleAuthCallback"
-    : `${config.baseUrl}/goto/callback`;
-  return uri;
+  return `${config.baseUrl}/goto/callback`;
 }
 
 /**

@@ -1,8 +1,9 @@
-import { createWebHistory, createRouter, RouteRecordNormalized } from "vue-router";
+import { createWebHistory, createRouter, RouteLocationNormalized } from "vue-router";
 import { watch } from "vue";
 import CallList from "../components/CallList.vue";
 import Login from "../components/Login.vue";
 import Settings from "../components/Settings.vue";
+import GoToAuthCallback from "../components/GoToAuthCallback.vue";
 import { useAuthStore } from "../stores/auth";
 import { useSnackbarStore } from "../stores/snackbar";
 
@@ -11,6 +12,16 @@ const routes = [
     path: "/",
     name: "CallList",
     component: CallList,
+  },
+  {
+    path: "/goto/callback",
+    name: "GoToAuthCallback",
+    component: GoToAuthCallback,
+    props: (route: RouteLocationNormalized) => ({
+      code: route.query.code,
+      state: route.query.state,
+    }),
+    meta: { admin: true },
   },
   {
     path: "/settings",

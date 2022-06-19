@@ -8,7 +8,7 @@ const { callQueueListener } = require("./callQueue/eventListener");
 
 exports.webhooks = webhooks;
 exports.getGoToAuthURL = authUrl;
-exports.handleAuthCallback = callback;
+exports.gotoConnectAuthCallback = callback;
 exports.disconnectGoTo = disconnect;
 exports.updateGotoWebhooks = update;
 exports.gotoScheduledWebhookTask = updateTask;

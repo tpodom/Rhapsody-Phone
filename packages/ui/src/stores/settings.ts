@@ -8,9 +8,14 @@ import { usePopupWindow } from "../composables/popup";
 import { watchOnce } from "@vueuse/core";
 import { useFirestore } from "../composables/firestore";
 
-type GoToAuthUrlResponseData = {
+interface GoToAuthUrlResponseData {
   url: string;
-};
+}
+
+interface CallbackData {
+  code: string;
+  state: string;
+}
 
 export const useSettingsStore = defineStore("settings", () => {
   const router = useRouter();
@@ -45,6 +50,10 @@ export const useSettingsStore = defineStore("settings", () => {
     return httpsCallable<void, void>(functions, "disconnectGoTo")();
   }
 
+  async function goToConnectAuthCallback(code: string, state: string) {
+    return httpsCallable<CallbackData, void>(functions, "gotoConnectAuthCallback")({ code, state });
+  }
+
   async function syncGoToConnect() {
     return httpsCallable<void, void>(functions, "updateGotoWebhooks")();
   }
@@ -58,6 +67,7 @@ export const useSettingsStore = defineStore("settings", () => {
     rhapsodySettings,
     loading,
     connectGoToConnect,
+    goToConnectAuthCallback,
     disconnectGoToConnect,
     syncGoToConnect,
     syncRhapsody,
