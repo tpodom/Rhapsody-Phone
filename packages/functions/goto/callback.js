@@ -11,11 +11,11 @@ exports.callback = functions
     validateIsAdmin(context.auth?.token);
 
     if (!code) {
-      throw new functions.HttpsError("invalid-argument", "Authorization code is required.");
+      throw new functions.https.HttpsError("invalid-argument", "Authorization code is required.");
     }
 
     if (!state) {
-      throw new functions.HttpsError("invalid-argument", "State is required.");
+      throw new functions.https.HttpsError("invalid-argument", "State is required.");
     }
 
     try {
@@ -27,6 +27,7 @@ exports.callback = functions
       const updatedSettings = await settings.updateAccount(account);
       logger.info(updatedSettings, { structuredData: true });
     } catch (err) {
-      throw new functions.HttpsError("internal", err.message);
+      logger.error(err);
+      throw new functions.https.HttpsError("internal", err.message);
     }
   });

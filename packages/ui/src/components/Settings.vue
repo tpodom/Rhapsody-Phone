@@ -22,7 +22,13 @@
             </div>
 
             <v-list-item-action>
-              <v-btn variant="outlined" color="error" @click="disconnectGoTo">Disconnect</v-btn>
+              <v-btn
+                variant="outlined"
+                color="error"
+                :loading="gotoConnectDisconnecting"
+                @click="disconnectGoTo"
+                >Disconnect</v-btn
+              >
             </v-list-item-action>
           </v-list-item>
           <v-list-item>
@@ -39,7 +45,13 @@
               <div>GoTo Connect sync has not been run.</div>
             </div>
             <v-list-item-action>
-              <v-btn variant="outlined" color="primary" @click="syncGoTo">Sync</v-btn>
+              <v-btn
+                variant="outlined"
+                color="primary"
+                @click="syncGoTo"
+                :loading="gotoConnectSyncing"
+                >Sync</v-btn
+              >
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -55,7 +67,9 @@
             <v-list-item-title class="flex-grow-1"></v-list-item-title>
             <v-list-item-action>
               <v-spacer />
-              <v-btn color="primary" @click="connectGoTo">Connect</v-btn>
+              <v-btn color="primary" :loading="gotoConnectConnecting" @click="connectGoTo"
+                >Connect</v-btn
+              >
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -93,7 +107,13 @@
               <div>Rhapsody sync has not been run.</div>
             </div>
             <v-list-item-action>
-              <v-btn variant="outlined" color="primary" @click="rhapsodySync">Sync</v-btn>
+              <v-btn
+                variant="outlined"
+                color="primary"
+                :loading="rhapsodySyncing"
+                @click="rhapsodySync"
+                >Sync</v-btn
+              >
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -106,7 +126,9 @@
             <v-list-item-title class="flex-grow-1"></v-list-item-title>
             <v-list-item-action>
               <v-spacer />
-              <v-btn color="primary" @click="rhapsodySync">Connect</v-btn>
+              <v-btn color="primary" :loading="rhapsodySyncing" @click="rhapsodySync"
+                >Connect</v-btn
+              >
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -122,6 +144,8 @@ import { ref, computed } from "vue";
 
 const settingsStore = useSettingsStore();
 const snackbarStore = useSnackbarStore();
+const gotoConnectConnecting = ref(false);
+const gotoConnectDisconnecting = ref(false);
 const gotoConnectSyncing = ref(false);
 const rhapsodySyncing = ref(false);
 
@@ -139,11 +163,12 @@ const formattedGoToConnectSyncTime = computed(() =>
 
 async function connectGoTo() {
   try {
-    gotoConnectSyncing.value = true;
+    gotoConnectConnecting.value = true;
     await settingsStore.connectGoToConnect();
   } catch (err) {
-    gotoConnectSyncing.value = false;
     snackbarStore.showError((err as Error).message);
+  } finally {
+    gotoConnectConnecting.value = false;
   }
 }
 
@@ -152,18 +177,20 @@ async function syncGoTo() {
     gotoConnectSyncing.value = true;
     await settingsStore.syncGoToConnect();
   } catch (err) {
-    gotoConnectSyncing.value = false;
     snackbarStore.showError((err as Error).message);
+  } finally {
+    gotoConnectSyncing.value = false;
   }
 }
 
 async function disconnectGoTo() {
   try {
-    gotoConnectSyncing.value = true;
+    gotoConnectDisconnecting.value = true;
     await settingsStore.disconnectGoToConnect();
   } catch (err) {
-    gotoConnectSyncing.value = false;
     snackbarStore.showError((err as Error).message);
+  } finally {
+    gotoConnectDisconnecting.value = false;
   }
 }
 async function rhapsodySync() {
@@ -171,8 +198,9 @@ async function rhapsodySync() {
     rhapsodySyncing.value = true;
     await settingsStore.syncRhapsody();
   } catch (err) {
-    rhapsodySyncing.value = false;
     snackbarStore.showError((err as Error).message);
+  } finally {
+    rhapsodySyncing.value = false;
   }
 }
 </script>

@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const functions = require("firebase-functions");
 const { logger } = require("./init");
 
 /**
@@ -18,7 +19,7 @@ exports.isAdmin = (token) => {
  */
 exports.validateIsAdmin = (token) => {
   if (!exports.isAdmin(token)) {
-    throw new Error("You are not authorized.");
+    throw new functions.https.HttpsError("permission-denied", "You are not authorized.");
   }
 };
 
