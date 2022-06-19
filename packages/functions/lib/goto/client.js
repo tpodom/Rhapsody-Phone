@@ -62,7 +62,7 @@ class Client {
                 sharedSecret: webhookSecret,
               },
             },
-            channelLifetime: config.emulator ? 600 : 60480, // 7 days
+            channelLifetime: config.emulator ? 600 : 604800, // 7 days
           },
         },
       )
