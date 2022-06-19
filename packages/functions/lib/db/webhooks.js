@@ -2,7 +2,7 @@ const { db } = require("../init");
 
 const eventTypes = {
   call: "call",
-  messaging: "mesasging",
+  messaging: "messaging",
 };
 
 /**

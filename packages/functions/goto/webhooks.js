@@ -16,8 +16,8 @@ router.get("/incoming", (request, response) => {
 });
 
 router.post("/incoming", async (request, response) => {
-  logger.info(request.body, { structuredData: true });
-  const eventId = request.body.CALL_ID;
+  logger.info("Incoming call event", request.body, { structuredData: true });
+  const eventId = `${request.body.CALL_ID}.incoming`;
 
   if (!(await webhooksStore.eventExists(webhooksStore.eventTypes.call, eventId))) {
     webhooksStore.saveEvent(
@@ -36,17 +36,16 @@ router.get("/missed", (request, response) => {
 });
 
 router.post("/missed", async (request, response) => {
-  logger.info(request.body, { structuredData: true });
-  const eventId = request.body.CALL_ID;
+  logger.info("Missed call event", request.body, { structuredData: true });
+  const eventId = `${request.body.CALL_ID}.missed`;
 
-  // Don't filter on call id, it will have same id as initial notification
-  // and we always want to make sure we process the hangup event.
-  webhooksStore.saveEvent(
-    webhooksStore.eventTypes.call,
-    eventId,
-    mapNotifyToEvent(request.body, "ENDED"),
-  );
-
+  if (!(await webhooksStore.eventExists(webhooksStore.eventTypes.call, eventId))) {
+    webhooksStore.saveEvent(
+      webhooksStore.eventTypes.call,
+      eventId,
+      mapNotifyToEvent(request.body, "ENDED"),
+    );
+  }
   response.sendStatus(202);
 });
 
@@ -56,7 +55,7 @@ router.get("/subscription", (request, response) => {
 });
 
 router.post("/subscription", async (request, response) => {
-  logger.info(request.body, { structuredData: true });
+  logger.info("Real-time subscription event", request.body, { structuredData: true });
 
   // Check to see if we already processed this event
 
