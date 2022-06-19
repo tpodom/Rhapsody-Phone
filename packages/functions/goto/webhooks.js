@@ -3,11 +3,14 @@ const functions = require("firebase-functions");
 const crypto = require("crypto");
 const webhooksStore = require("../lib/db/webhooks");
 const { createExpressRequest } = require("../lib/express");
+const express = require("express");
 
 // TODO implement webhook signature verification
 const expressApp = createExpressRequest();
+// eslint-disable-next-line new-cap
+const router = express.Router();
 
-expressApp.post("/incoming", async (request, response) => {
+router.post("/incoming", async (request, response) => {
   logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
 
@@ -22,7 +25,7 @@ expressApp.post("/incoming", async (request, response) => {
   response.sendStatus(202);
 });
 
-expressApp.post("/missed", async (request, response) => {
+router.post("/missed", async (request, response) => {
   logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
 
@@ -37,7 +40,7 @@ expressApp.post("/missed", async (request, response) => {
   response.sendStatus(202);
 });
 
-expressApp.post("/subscription", async (request, response) => {
+router.post("/subscription", async (request, response) => {
   logger.info(request.body, { structuredData: true });
 
   // Check to see if we already processed this event
@@ -77,6 +80,8 @@ expressApp.post("/subscription", async (request, response) => {
 
   response.sendStatus(202);
 });
+
+expressApp.use("/webhooks", router);
 
 /**
  * We don't receive a unique id on the webhook so we hash it to generate a fingerprint.
