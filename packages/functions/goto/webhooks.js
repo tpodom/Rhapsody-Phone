@@ -110,4 +110,4 @@ function mapNotifyToEvent(body, state) {
   };
 }
 
-exports = functions.https.onRequest(expressApp);
+module.exports = functions.https.onRequest(expressApp);
