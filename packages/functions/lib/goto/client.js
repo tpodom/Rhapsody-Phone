@@ -56,7 +56,7 @@ class Client {
             channelType: "Webhook",
             webhookChannelData: {
               webhook: {
-                url: `${config.baseUrl}/webhooks/goto`,
+                url: `${config.baseUrl}/webhooks/subscription`,
               },
               signature: {
                 sharedSecret: webhookSecret,

@@ -39,13 +39,13 @@ router.post("/missed", async (request, response) => {
   logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
 
-  if (!(await webhooksStore.eventExists(webhooksStore.eventTypes.call, eventId))) {
-    webhooksStore.saveEvent(
-      webhooksStore.eventTypes.call,
-      eventId,
-      mapNotifyToEvent(request.body, "HUNGUP"),
-    );
-  }
+  // Don't filter on call id, it will have same id as initial notification
+  // and we always want to make sure we process the hangup event.
+  webhooksStore.saveEvent(
+    webhooksStore.eventTypes.call,
+    eventId,
+    mapNotifyToEvent(request.body, "HUNGUP"),
+  );
 
   response.sendStatus(202);
 });
