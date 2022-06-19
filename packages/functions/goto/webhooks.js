@@ -10,6 +10,11 @@ const expressApp = createExpressRequest();
 // eslint-disable-next-line new-cap
 const router = express.Router();
 
+// Add GET operation to allow GoTo Connect HEAD operation to work
+router.get("/incoming", (request, response) => {
+  response.send(200);
+});
+
 router.post("/incoming", async (request, response) => {
   logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
@@ -25,6 +30,11 @@ router.post("/incoming", async (request, response) => {
   response.sendStatus(202);
 });
 
+// Add GET operation to allow GoTo Connect HEAD operation to work
+router.get("/missed", (request, response) => {
+  response.send(200);
+});
+
 router.post("/missed", async (request, response) => {
   logger.info(request.body, { structuredData: true });
   const eventId = request.body.CALL_ID;
@@ -38,6 +48,11 @@ router.post("/missed", async (request, response) => {
   }
 
   response.sendStatus(202);
+});
+
+// Add GET operation to allow GoTo Connect HEAD operation to work
+router.get("/subscription", (request, response) => {
+  response.send(200);
 });
 
 router.post("/subscription", async (request, response) => {
