@@ -3,8 +3,9 @@ import type {
   QueryDocumentSnapshot,
   DocumentData,
   DocumentSnapshot,
+  QuerySnapshot,
 } from "firebase/firestore";
-import { onSnapshot, DocumentReference } from "firebase/firestore";
+import { getDocs, limit, onSnapshot, query, DocumentReference } from "firebase/firestore";
 import { ref, Ref } from "vue";
 import { isDef, tryOnScopeDispose } from "@vueuse/core";
 

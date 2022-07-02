@@ -1,17 +1,45 @@
 import { createWebHistory, createRouter, RouteLocationNormalized } from "vue-router";
 import { watch } from "vue";
-import CallList from "../components/CallList.vue";
-import Login from "../components/Login.vue";
-import Settings from "../components/Settings.vue";
-import GoToAuthCallback from "../components/GoToAuthCallback.vue";
+import Login from "../views/Login.vue";
+import Settings from "../views/Settings.vue";
+import GoToAuthCallback from "../views/GoToAuthCallback.vue";
 import { useAuthStore } from "../stores/auth";
 import { useSnackbarStore } from "../stores/snackbar";
+import CallList from "../views/CallList.vue";
+import Messages from "../views/Messages.vue";
+import MessagesNavContent from "../components/messages/MessagesNavContent.vue";
+import NoConversationSelected from "../components/messages/NoConversationSelected.vue";
+import Conversation from "../components/messages/Conversation.vue";
 
 const routes = [
   {
     path: "/",
-    name: "CallList",
+    name: "index",
+    redirect: "/calls",
+  },
+  {
+    path: "/calls",
+    name: "Calls",
     component: CallList,
+  },
+  {
+    path: "/messages",
+    name: "Messages",
+    components: {
+      default: Messages,
+      "nav-content": MessagesNavContent,
+    },
+    children: [
+      {
+        path: "",
+        component: NoConversationSelected,
+      },
+      {
+        path: ":id",
+        component: Conversation,
+        props: true,
+      },
+    ],
   },
   {
     path: "/goto/callback",

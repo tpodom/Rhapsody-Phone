@@ -1,16 +1,20 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-card class="mx-auto" max-width="344" variant="outlined">
-        <v-card-text
-          >This site requires authentication. Please click Log In to to proceed.</v-card-text
-        >
-        <v-card-actions>
-          <v-btn :loading="authenticating" @click="authenticate">Log In</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+  <v-main>
+    <v-container fluid>
+      <v-row>
+        <v-col>
+          <v-card class="mx-auto" max-width="344" variant="outlined">
+            <v-card-text
+              >This site requires authentication. Please click Log In to to proceed.</v-card-text
+            >
+            <v-card-actions>
+              <v-btn :loading="authenticating" @click="authenticate">Log In</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-main>
 </template>
 
 <script setup lang="ts">

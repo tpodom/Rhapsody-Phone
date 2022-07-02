@@ -33,8 +33,8 @@
 <script setup lang="ts">
 import { VIcon } from "vuetify/components";
 import { computed, ref, watchEffect, Ref } from "vue";
-import { useClientsStore, Pet } from "../stores/clients";
-import { formatRelativeAppointmentTime } from "../lib/formatters";
+import { useClientsStore, Pet } from "../../stores/clients";
+import { formatRelativeAppointmentTime } from "../../lib/formatters";
 import PetName from "./PetName.vue";
 
 interface Props {

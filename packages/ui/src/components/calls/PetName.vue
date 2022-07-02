@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { VIcon } from "vuetify/components";
-import { Gender, Pet, SpayedNeuteredStatus } from "../stores/clients";
+import { Gender, Pet, SpayedNeuteredStatus } from "../../stores/clients";
 import { computed } from "vue";
 
 interface Props {

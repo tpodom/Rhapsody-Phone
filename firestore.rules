@@ -27,5 +27,8 @@ service cloud.firestore {
     match /call_queue/{document=**} {
       allow read, write: if isAuthenticated()
     }
+    match /conversations/{document=**} {
+      allow read, write: if isAuthenticated()
+    }
   }
 }

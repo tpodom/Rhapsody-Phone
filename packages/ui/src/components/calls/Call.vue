@@ -17,10 +17,10 @@
 
 <script setup lang="ts">
 import { VIcon } from "vuetify/components";
-import { computed, watch, ref } from "vue";
+import { computed } from "vue";
 import RhapsodyClientCall from "./RhapsodyClientCall.vue";
-import { formatPhoneNumber } from "../lib/formatters";
-import { Call } from "../stores/calls";
+import { formatPhoneNumber } from "../../lib/formatters";
+import { Call } from "../../stores/calls";
 
 interface Props {
   call: Call;
