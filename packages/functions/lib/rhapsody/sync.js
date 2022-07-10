@@ -1,6 +1,6 @@
 const { createClient } = require("./client");
 const {
-  getSettings,
+  getSettingsData,
   updateBusiness,
   updateLastSyncTime,
 } = require("../../lib/db/rhapsodySettings");
@@ -17,7 +17,7 @@ const IGNORED_APPOINTMENT_TYPES = ["OTC Sale"];
  */
 exports.sync = async (apiKey) => {
   const client = createClient(apiKey);
-  let settings = await getSettings();
+  let settings = await getSettingsData();
 
   try {
     if (!settings.business) {
@@ -89,7 +89,7 @@ async function syncAppointments(client, settings) {
       if (!clientRecord) {
         logger.info(`Client ${appointment.clientId} was not found, syncing them now.`);
         clientRecord = await client.getClient(appointment.clientId);
-        clientRecord = await clientsStore.upsertClient(clientRecord);
+        clientRecord = await clientsStore.upsertClient(clientRecord).data();
       }
 
       let petRecord = await clientsStore.getPet(appointment.clientId, appointment.patientId);
@@ -98,7 +98,7 @@ async function syncAppointments(client, settings) {
           `Pet ${appointment.patientId} for client ${appointment.clientId} was not found, syncing them now.`,
         );
         petRecord = await client.getPet(appointment.patientId);
-        petRecord = await clientsStore.upsertPet(appointment.clientId, petRecord);
+        petRecord = await clientsStore.upsertPet(appointment.clientId, petRecord).data();
       }
 
       await clientsStore.upsertAppointment(appointment.clientId, appointment);

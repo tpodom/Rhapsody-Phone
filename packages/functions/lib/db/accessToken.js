@@ -17,9 +17,11 @@ function get(serviceName) {
  * @param {object} data The updated data values
  * @return {Promise<object>} Promise that resolves to the modified token.
  */
-function update(serviceName, data) {
+async function update(serviceName, data) {
   console.log(`Setting ${serviceName} with value ${JSON.stringify(data)}`);
-  return getDocRef(serviceName).set(data);
+  const docRef = getDocRef(serviceName);
+  await docRef.set(data);
+  return docRef.get();
 }
 
 /**

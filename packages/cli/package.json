@@ -72,5 +72,8 @@
   "keywords": [
     "oclif"
   ],
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "volta": {
+    "extends": "../../package.json"
+  }
 }

@@ -7,7 +7,7 @@ exports.authUrl = functions
   .runWith({ secrets: ["GOTO_CLIENT_ID", "GOTO_CLIENT_SECRET"] })
   .https.onCall(async (data, context) => {
     validateIsAdmin(context.auth?.token);
-
+    console.log(process.env);
     return {
       url: await oauth.buildAuthorizationUrl(),
     };

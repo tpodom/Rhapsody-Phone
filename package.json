@@ -8,7 +8,10 @@
   "private": true,
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "debug-emulators": "npm run emulators -- --inspect-functions",
+    "emulators": "firebase emulators:start --import firebase-export --export-on-exit",
     "format": "prettier --write .",
+    "kill-emulators": "ps -efaww | grep firebase | awk '{print $2}' | xargs kill",
     "test": "npm run test --workspaces --if-present"
   },
   "workspaces": [
@@ -16,6 +19,7 @@
   ],
   "devDependencies": {
     "eslint-config-prettier": "^8.5.0",
+    "firebase-tools": "^10.9.2",
     "jest": "^28.1.0",
     "prettier": "^2.6.2"
   },

@@ -1,8 +1,8 @@
 const { logger } = require("../init");
 const { AuthorizationCode } = require("simple-oauth2");
-const crypto = require("crypto");
 const config = require("../config");
 const accessTokenStore = require("../db/accessToken");
+const { generateId } = require("../generator");
 
 const GOTO_CONNECT_SERVICE_NAME = "goto_connect";
 
@@ -14,7 +14,7 @@ const GOTO_CONNECT_SERVICE_NAME = "goto_connect";
 exports.buildAuthorizationUrl = async () => {
   const oauthConfig = createConfig();
   const client = new AuthorizationCode(oauthConfig);
-  const state = crypto.randomUUID();
+  const state = generateId();
   const result = await accessTokenStore.update(GOTO_CONNECT_SERVICE_NAME, { state });
   logger.log("Stored state ", result);
   return client.authorizeURL({

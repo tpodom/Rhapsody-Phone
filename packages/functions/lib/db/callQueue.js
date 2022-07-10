@@ -28,17 +28,20 @@ async function findActiveCall(callerNumber) {
  * @param {string} callerName
  */
 async function callStarted(callId, callerNumber, callerName) {
-  return getCallQueue()
-    .doc(callId)
-    .create({
-      startTime: new Date(),
-      endTime: null,
-      state: CALL_STATES.CALLING,
-      caller: {
-        phoneNumber: callerNumber,
-        name: callerName,
-      },
-    });
+  const callRef = getCallQueue().doc(callId);
+
+  await callRef.create({
+    id: callId,
+    startTime: new Date(),
+    endTime: null,
+    state: CALL_STATES.CALLING,
+    caller: {
+      phoneNumber: callerNumber,
+      name: callerName,
+    },
+  });
+
+  return callRef.get();
 }
 
 /**
@@ -48,8 +51,11 @@ async function callStarted(callId, callerNumber, callerName) {
  * @param {object} details Call details
  * @return {Promise<object>} Modified call record
  */
-function updateCallDetails(callId, details) {
-  return getCallQueue().doc(callId).set(details, { merge: true });
+async function updateCallDetails(callId, details) {
+  const callRef = getCallQueue().doc(callId);
+  await callRef.set(details, { merge: true });
+
+  return callRef.get();
 }
 
 /**
@@ -59,13 +65,17 @@ function updateCallDetails(callId, details) {
  * @return {Promise<object>} Modified call record
  */
 async function callEnded(callId) {
-  return getCallQueue().doc(callId).set(
+  const callRef = getCallQueue().doc(callId);
+
+  callRef.set(
     {
       state: CALL_STATES.ENDED,
       endTime: new Date(),
     },
     { merge: true },
   );
+
+  return callRef.get();
 }
 
 /**

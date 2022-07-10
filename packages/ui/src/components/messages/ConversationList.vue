@@ -3,9 +3,8 @@
     <v-progress-circular indeterminate color="primary" /> Loading...
   </div>
   <div v-else class="d-flex flex-column fill-height">
-    <v-btn rounded class="mt-3 ml-3 mr-3 mb-1 align-self-start" color="primary">
-      <v-icon icon="mdi-message-outline" /> New Chat
-    </v-btn>
+    <CreateChatButton />
+
     <div
       v-if="!messagingStore.conversations?.length"
       class="d-flex flex-grow-1 justify-center ma-3"
@@ -24,6 +23,8 @@
 <script setup lang="ts">
 import { useMessagingStore } from "../../stores/messaging";
 import ConversationListItem from "./ConversationListItem.vue";
+import CreateChatButtonVue from "./CreateChatButton.vue";
+import CreateChatButton from "./CreateChatButton.vue";
 
 const messagingStore = useMessagingStore();
 </script>

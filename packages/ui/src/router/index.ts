@@ -37,7 +37,7 @@ const routes = [
       {
         path: ":id",
         component: Conversation,
-        props: true,
+        props: (route: RouteLocationNormalized) => ({ id: route.params.id }),
       },
     ],
   },

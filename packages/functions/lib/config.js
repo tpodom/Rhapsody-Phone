@@ -8,6 +8,7 @@ const config = {
     connectApiBaseUrl: "https://api.jive.com",
     connectRealtimeApiBaseUrl: "https://realtime.jive.com",
     messagingApiBaseUrl: "https://api.jive.com/messaging",
+    channelName: process.env.GOTO_CONNECT_CHANNEL_NAME || "vet-connect",
   },
 };
 

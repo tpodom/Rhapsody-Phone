@@ -18,7 +18,7 @@ service cloud.firestore {
     match /call_webhook_events/{document=**} {
       allow read, write: if isAdmin();
     }
-    match /mesasging_webhook_events/{document=**} {
+    match /messaging_webhook_events/{document=**} {
       allow read, write: if isAdmin();
     }
     match /clients/{document=**} {

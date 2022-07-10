@@ -65,7 +65,7 @@ router.post("/subscription", async (request, response) => {
     if (!(await webhooksStore.eventExists(webhooksStore.eventTypes.call, eventId))) {
       const { state, caller, callee, direction } = request.body.data;
       await webhooksStore.saveEvent(webhooksStore.eventTypes.call, eventId, {
-        timestamp: request.body.timestamp,
+        timestamp: new Date(request.body.timestamp),
         direction,
         state,
         caller,
@@ -79,13 +79,16 @@ router.post("/subscription", async (request, response) => {
         request.body.content.id,
       ))
     ) {
-      const { direction, body, timestamp, contactPhoneNumbers } = request.body.content;
+      const { direction, body, timestamp, contactPhoneNumbers, authorPhoneNumber, media } =
+        request.body.content;
 
       await webhooksStore.saveEvent(webhooksStore.eventTypes.messaging, request.body.content.id, {
         timestamp,
+        authorPhoneNumber,
         contactPhoneNumbers,
         direction,
         body,
+        media,
       });
     }
   } else {
@@ -116,7 +119,7 @@ function hashBody(body) {
  */
 function mapNotifyToEvent(body, state) {
   return {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date(),
     direction: "recipient",
     state,
     caller: {

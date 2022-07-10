@@ -24,11 +24,7 @@
                 </div>
 
                 <v-list-item-action>
-                  <v-btn
-                    variant="outlined"
-                    color="error"
-                    :loading="gotoConnectDisconnecting"
-                    @click="disconnectGoTo"
+                  <v-btn color="error" :loading="gotoConnectDisconnecting" @click="disconnectGoTo"
                     >Disconnect</v-btn
                   >
                 </v-list-item-action>
@@ -47,11 +43,7 @@
                   <div>GoTo Connect sync has not been run.</div>
                 </div>
                 <v-list-item-action>
-                  <v-btn
-                    variant="outlined"
-                    color="primary"
-                    @click="syncGoTo"
-                    :loading="gotoConnectSyncing"
+                  <v-btn color="primary" @click="syncGoTo" :loading="gotoConnectSyncing"
                     >Sync</v-btn
                   >
                 </v-list-item-action>
@@ -113,11 +105,7 @@
                   <div>Rhapsody sync has not been run.</div>
                 </div>
                 <v-list-item-action>
-                  <v-btn
-                    variant="outlined"
-                    color="primary"
-                    :loading="rhapsodySyncing"
-                    @click="rhapsodySync"
+                  <v-btn color="primary" :loading="rhapsodySyncing" @click="rhapsodySync"
                     >Sync</v-btn
                   >
                 </v-list-item-action>
