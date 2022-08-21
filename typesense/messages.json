@@ -1,6 +1,7 @@
 {
   "name": "messages",
   "fields": [
+    { "name": "deployment", "type": "string" },
     { "name": "body", "type": "string" },
     { "name": "timestamp", "type": "int64" },
     { "name": "conversationId", "type": "string", "facet": true },

@@ -18,12 +18,16 @@ jobs:
           echo "FIREBASE_PROJECT_ID=rhapsody-connect-dev" >> $GITHUB_ENV
           echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_DEV" >> $GITHUB_ENV
           echo "FIREBASE_CONFIG_SECRET_PREFIX=FIREBASE_CONFIG_DEV" >> $GITHUB_ENV
+          echo "DEPLOYMENT_NAME=rhapsody-connect-dev" >> $GITHUB_ENV
+          echo "TYPESENSE_HOSTS=9ueor1npiza4yw3kp-1.a1.typesense.net" >> $GITHUB_ENV
       - name: Set env vars (atrium cat)
         if: endsWith(github.ref, '/atriumcat')
         run: |
           echo "FIREBASE_PROJECT_ID=rhapsody-connect-atriumcat" >> $GITHUB_ENV
           echo "FIREBASE_CONFIG_SECRET_PREFIX=FIREBASE_CONFIG_ATRIUMCAT" >> $GITHUB_ENV
           echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_ATRIUMCAT" >> $GITHUB_ENV
+          echo "DEPLOYMENT_NAME=atriumcat" >> $GITHUB_ENV
+          echo "TYPESENSE_HOSTS=9ueor1npiza4yw3kp-1.a1.typesense.net" >> $GITHUB_ENV
       - name: Set UI env vars
         run: |
           echo "" >> packages/ui/.env
@@ -35,12 +39,21 @@ jobs:
           echo "VITE_FIREBASE_APP_ID=${{ secrets[format('{0}_APP_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
           echo "VITE_FIREBASE_MEASUREMENT_ID=${{ secrets[format('{0}_MEASUREMENT_ID', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
           echo "VITE_APP_CHECK_SITE_KEY=${{ secrets[format('{0}_APP_CHECK_SITE_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_TYPESENSE_HOSTS=${{ env.TYPESENSE_HOSTS }}" >> packages/ui/.env
+          echo "VITE_TYPESENSE_API_KEY=${{ secrets[format('{0}_TYPESENSE_SEARCH_API_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/ui/.env
+          echo "VITE_TYPESENSE_PORT=443" >> packages/ui/.env
+          echo "VITE_TYPESENSE_PROTOCOL=https" >> packages/ui/.env
           cat ./packages/ui/.env
       - name: Set functions env vars
         run: |
           echo "" >> packages/functions/.env
           echo "BASE_URL=${{ secrets[format('{0}_BASE_URL', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/functions/.env
           echo "MAIN_PHONE_NUMBER=${{ secrets[format('{0}_MAIN_PHONE_NUMBER', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/functions/.env
+          echo "DEPLOYMENT=${{ env.DEPLOYMENT_NAME }}" >> packages/functions/.env
+          echo "TYPESENSE_HOSTS=${{ env.TYPESENSE_HOSTS }}" >> packages/functions/.env
+          echo "TYPESENSE_PORT=443" >> packages/functions/.env
+          echo "TYPESENSE_PROTOCOL=https" >> packages/functions/.env
+          echo "TYPESENSE_API_KEY=${{ secrets[format('{0}_TYPESENSE_API_KEY', env.FIREBASE_CONFIG_SECRET_PREFIX)] }}" >> packages/functions/.env
           cat ./packages/functions/.env
       - run: npm ci
       - run: npm run build

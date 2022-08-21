@@ -1,5 +1,6 @@
 const config = {
   baseUrl: process.env.BASE_URL,
+  deployment: process.env.DEPLOYMENT || "local",
   emulator: process.env.FUNCTIONS_EMULATOR === "true",
   mainPhoneNumber: process.env.MAIN_PHONE_NUMBER,
   gotoConnect: {

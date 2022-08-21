@@ -1,6 +1,7 @@
 {
   "name": "clients",
   "fields": [
+    { "name": "deployment", "type": "string" },
     { "name": "name", "type": "string" },
     { "name": "timestamp", "type": "int64" },
     { "name": "phone_number", "type": "string[]" }

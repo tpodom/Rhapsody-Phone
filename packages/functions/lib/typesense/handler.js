@@ -1,6 +1,21 @@
+const config = require("../config");
 const { logger } = require("../init");
 const { formatPhoneNumber } = require("../phone");
 const { isConfigured, createClient } = require("./client");
+
+/**
+ * Maps document snapshot to search data with standard fields added.
+ *
+ * @param {DocumentSnapshot} documentSnapshot Document snapshot to convert to Typesense
+ * @param {function(DocumentSnapshot): object} mapper Maps snapshot to search data
+ * @return {object} Search document data
+ */
+function mapDocument(documentSnapshot, mapper) {
+  return {
+    deployment: config.deployment,
+    ...mapper(documentSnapshot),
+  };
+}
 
 /**
  * Maps a Firestore timestamp to a Unix time. Typesense does
@@ -50,7 +65,7 @@ function indexDocumentChange(collectionName, change, mapper) {
 
   if (change.before.data() == null) {
     // Create
-    const typesenseDocument = mapper(change.after);
+    const typesenseDocument = mapDocument(mapper(change.after));
     logger.debug(`Creating ${collectionName} document ${JSON.stringify(typesenseDocument)}`);
 
     return client
@@ -65,7 +80,7 @@ function indexDocumentChange(collectionName, change, mapper) {
     return client.collections(encodeURIComponent(collectionName)).documents(documentId).delete();
   } else {
     // Update
-    const typesenseDocument = mapper(change.after);
+    const typesenseDocument = mapDocument(mapper(change.after));
     logger.debug(`Upserting ${collectionName} document ${JSON.stringify(typesenseDocument)}`);
 
     return client
@@ -115,7 +130,7 @@ async function indexQuerySnapshot(collectionName, querySnapshot, mapper, batchSi
   if (!querySnapshot.empty) {
     querySnapshot.forEach(async (documentSnapshot) => {
       currentDocumentNumber += 1;
-      currentDocumentsBatch.push(mapper(documentSnapshot));
+      currentDocumentsBatch.push(mapDocument(documentSnapshot, mapper));
 
       if (currentDocumentNumber === batchSize) {
         await importBatch();
