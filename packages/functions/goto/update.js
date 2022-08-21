@@ -4,7 +4,10 @@ const { validateIsAdmin } = require("../lib/auth");
 const { updateWebhooks } = require("../lib/goto/updateWebhooks");
 
 exports.update = functions
-  .runWith({ secrets: ["GOTO_WEBHOOK_SECRET"], timeoutSeconds: 300 })
+  .runWith({
+    secrets: ["GOTO_WEBHOOK_SECRET", "GOTO_CLIENT_ID", "GOTO_CLIENT_SECRET"],
+    timeoutSeconds: 300,
+  })
   .https.onCall(async (data, context) => {
     validateIsAdmin(context.auth?.token);
     try {
@@ -17,7 +20,10 @@ exports.update = functions
   });
 
 exports.updateTask = functions
-  .runWith({ secrets: ["GOTO_WEBHOOK_SECRET"], timeoutSeconds: 540 })
+  .runWith({
+    secrets: ["GOTO_WEBHOOK_SECRET", "GOTO_CLIENT_ID", "GOTO_CLIENT_SECRET"],
+    timeoutSeconds: 540,
+  })
   .pubsub.schedule("15 6,18 * * *")
   .timeZone("America/New_York")
   .onRun(async (context) => {

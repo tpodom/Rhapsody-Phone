@@ -57,7 +57,9 @@ class Client {
             channelType: "Webhook",
             webhookChannelData: {
               webhook: {
-                url: `${config.baseUrl}/webhooks/subscription`,
+                url: config.emulator
+                  ? "https://rhapsody-connect-dev.odom.dev/webhooks/subscription"
+                  : `${config.baseUrl}/webhooks/subscription`,
               },
               signature: {
                 sharedSecret: webhookSecret,
@@ -269,7 +271,6 @@ class Client {
 
       list.push(...pageResult.items);
       pageMarker = pageResult?.nextPageMarker;
-      console.log(pageMarker);
       done = !pageMarker;
       i++;
     }

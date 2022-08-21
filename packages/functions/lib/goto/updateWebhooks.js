@@ -10,6 +10,11 @@ const CHANNEL_NAME = config.gotoConnect.channelName;
  * Subscribes to GoTo Connect webhooks (calls and SMS).
  */
 async function updateWebhooks() {
+  if (!process.env.GOTO_CLIENT_SECRET || !process.env.GOTO_CLIENT_ID) {
+    logger.error("GoTo Connect client credentials are not configured, cannot update webhooks.");
+    return;
+  }
+
   const gotoSettings = await settings.getSettingsData();
 
   if (!gotoSettings?.accountKey) {
