@@ -50,7 +50,9 @@ exports.connectApp = async (authCode, state) => {
 
   const accessToken = await client.getToken(tokenParams);
   await accessTokenStore.update(GOTO_CONNECT_SERVICE_NAME, JSON.parse(JSON.stringify(accessToken)));
-  logger.debug("GoTo Connect authorization completed", accessToken, { structuredData: true });
+  logger.debug("GoTo Connect authorization completed", JSON.parse(JSON.stringify(accessToken)), {
+    structuredData: true,
+  });
   return accessToken;
 };
 
