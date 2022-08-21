@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const messaginStore = require("../lib/db/messaging");
+const messagingStore = require("../lib/db/messaging");
 const { validateIsAuthenticated } = require("../lib/auth");
 
 exports.markMessageRead = functions.https.onCall(
@@ -17,7 +17,7 @@ exports.markMessageRead = functions.https.onCall(
       throw new functions.https.HttpsError("invalid-argument", "You must specify a message id.");
     }
 
-    const conversationSnapshot = await messaginStore.getConversation(conversationId);
+    const conversationSnapshot = await messagingStore.getConversation(conversationId);
 
     if (!conversationSnapshot) {
       throw new functions.https.HttpsError(
@@ -26,7 +26,7 @@ exports.markMessageRead = functions.https.onCall(
       );
     }
 
-    const messageSnapshot = await messaginStore.getMessage(conversationId, messageId);
+    const messageSnapshot = await messagingStore.getMessage(conversationId, messageId);
 
     if (!messageSnapshot) {
       throw new functions.https.HttpsError(
@@ -35,7 +35,7 @@ exports.markMessageRead = functions.https.onCall(
       );
     }
 
-    return messaginStore.upsertMessage(conversationId, {
+    return messagingStore.upsertMessage(conversationId, {
       id: messageId,
       read: true,
     });

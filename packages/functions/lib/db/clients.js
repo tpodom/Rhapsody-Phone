@@ -23,15 +23,24 @@ async function findClientByPhone(phoneNumber) {
  * Retrieves a single client.
  *
  * @param {string} clientId Client ID
- * @return {Promise<object | null>} Client data if found or null if it does not exist
+ * @return {Promise<DocumentSnapshot | null>} Client data if found or null if it does not exist
  */
 async function getClient(clientId) {
-  const clientRef = await getClientsCollectionRef().doc(clientId).get();
+  const clientSnapshot = await getClientsCollectionRef().doc(clientId).get();
 
-  if (clientRef.exists) {
-    return clientRef;
+  if (clientSnapshot.exists) {
+    return clientSnapshot;
   }
   return null;
+}
+
+/**
+ * Returns a query snapshot of all clients.
+ *
+ * @return {Promise<QuerySnapshot>} Query of all clients
+ */
+async function getClientsQuerySnapshot() {
+  return getClientsCollectionRef().get();
 }
 
 /**
@@ -44,7 +53,11 @@ async function upsertClient(client) {
   const { patients, ...clientData } = client;
   const clientRef = getClientsCollectionRef().doc(client.id);
   await clientRef.set(clientData, { merge: true });
-  await updatePets(clientRef, patients);
+
+  if (patients) {
+    await updatePets(clientRef, patients);
+  }
+
   return clientRef.get();
 }
 
@@ -166,6 +179,7 @@ function convertDates(obj, ...fields) {
 
 exports.findClientByPhone = findClientByPhone;
 exports.getClient = getClient;
+exports.getClientsQuerySnapshot = getClientsQuerySnapshot;
 exports.upsertClient = upsertClient;
 exports.getPet = getPet;
 exports.upsertPet = upsertPet;

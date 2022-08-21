@@ -2,8 +2,10 @@
   <div class="message-wrapper mb-2 d-flex flex-column" :class="classes">
     <div class="d-flex align-center">
       <div class="message pa-3">{{ props.message.body }}</div>
-      <div v-if="sending" class="ml-3"><v-progress-circular indeterminate color="primary" /></div>
-      <div v-else-if="error" class="ml-3">
+      <div v-if="sending" class="ml-3" data-html2canvas-ignore>
+        <v-progress-circular indeterminate color="primary" />
+      </div>
+      <div v-else-if="error" class="ml-3" data-html2canvas-ignore>
         <v-menu location="left">
           <template #activator="{ props: menuProps }">
             <v-tooltip>
@@ -24,13 +26,16 @@
       </div>
     </div>
     <div v-intersect="onIntersect" class="timestamp d-flex align-center">
-      {{ messageTimestamp }} <UnreadIndicator v-if="!props.message.read" class="ml-1" />
+      {{ messageTimestamp }}
+      <UnreadIndicator v-if="!props.message.read" class="ml-1" data-html2canvas-ignore />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Message, SentStatus, useMessagingStore } from "../../stores/messaging";
+import type { Message } from "../../types/messaging";
+import { SentStatus } from "../../types/messaging";
+import { useMessagingStore } from "../../stores/messaging";
 import { computed, ref } from "vue";
 import UnreadIndicator from "./UnreadIndicator.vue";
 
@@ -106,7 +111,7 @@ const onIntersect = (entryIsIntersecting: boolean) => {
     }
 
     .message {
-      background-color: rgba(var(--v-theme-on-surface), var(--v-selected-opacity));
+      background-color: #ebebeb; /*rgba(var(--v-theme-on-surface), var(--v-selected-opacity));*/
     }
   }
 

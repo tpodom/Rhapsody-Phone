@@ -14,6 +14,26 @@ async function getConversation(conversationId) {
 }
 
 /**
+ * Returns a query snapshot of all conversations.
+ *
+ * @return {Promise<QuerySnapshot>}
+ */
+function getConversationsQuerySnapshot() {
+  return getConversationsRef().get();
+}
+
+/**
+ * Returns a query snapshot of all messages for a conversation.
+ *
+ * @param {string} conversationId The ID of the conversation containing the messages.
+ *
+ * @return {Promise<QuerySnapshot>}
+ */
+function getMessagesQuerySnapshot(conversationId) {
+  return getConversationsRef().doc(conversationId).collection("messages").get();
+}
+
+/**
  * Retrieves a single message.
  *
  * @param {string} conversationId Conversation ID
@@ -39,6 +59,7 @@ async function getMessage(conversationId, messageId) {
  */
 async function upsertConversation(conversation) {
   const conversationRef = getConversationsRef().doc(conversation.id);
+
   await conversationRef.set(conversation, { merge: true });
   return conversationRef.get();
 }
@@ -75,7 +96,7 @@ async function updateConversationAggregations(conversationId, messageBefore, mes
       return;
     }
 
-    let { timestamp, unreadCount, latestMessage } = conversationSnapshot.data();
+    let { timestamp, errorCount, unreadCount, latestMessage } = conversationSnapshot.data();
 
     if (!latestMessage || messageAfter.data().timestamp > timestamp) {
       timestamp = messageAfter.data().timestamp;
@@ -91,8 +112,18 @@ async function updateConversationAggregations(conversationId, messageBefore, mes
       unreadCount += 1;
     }
 
+    const wasError = messageBefore.data() && messageBefore.data().sentStatus === "ERROR";
+    const isError = messageAfter.data() && messageAfter.data().sentStatus === "ERROR";
+
+    if (wasError && !isError) {
+      errorCount -= 1;
+    } else if (isError) {
+      errorCount += 1;
+    }
+
     transaction.update(conversationRef, {
       timestamp,
+      errorCount,
       unreadCount,
       latestMessage: latestMessage || null,
     });
@@ -159,6 +190,8 @@ function getConversationsRef() {
 }
 
 exports.getConversation = getConversation;
+exports.getConversationsQuerySnapshot = getConversationsQuerySnapshot;
+exports.getMessagesQuerySnapshot = getMessagesQuerySnapshot;
 exports.getMessage = getMessage;
 exports.upsertConversation = upsertConversation;
 exports.upsertMessage = upsertMessage;

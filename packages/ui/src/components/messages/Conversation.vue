@@ -1,15 +1,24 @@
 <template>
   <v-app-bar elevation="1" app>
-    <v-toolbar-title>{{ state.conversation?.client.name }}</v-toolbar-title>
-    <v-spacer />
-    <v-menu location="bottom center">
-      <template #activator="{ props }">
-        <v-btn v-bind="props" icon="mdi-dots-vertical" :disabled="!state.conversation" />
-      </template>
-      <v-list>
-        <v-list-item>Download PDF</v-list-item>
-      </v-list>
-    </v-menu>
+    <v-toolbar-title class="flex-grow-1">
+      <span v-if="state.conversation?.client.name">
+        {{ state.conversation?.client.name }} &mdash;
+      </span>
+      <span>{{ formattedClientNumber }}</span>
+    </v-toolbar-title>
+
+    <ClientInfoButton
+      v-if="state.conversation?.client.id"
+      :client-id="state.conversation.client.id"
+    />
+
+    <ConversationDownloadButton
+      v-if="state.conversation"
+      :conversation="state.conversation"
+      :messages="state.messages"
+    />
+
+    <ConversationLabelButton v-if="state.conversation" :conversation="state.conversation" />
   </v-app-bar>
 
   <v-main>
@@ -18,15 +27,22 @@
         <div v-if="conversationNotFound">
           The selected conversation was not found, perhaps it was deleted?
         </div>
+
         <div v-else-if="messagesLoading">
           <v-progress-circular indeterminate color="primary" /> Loading...
         </div>
-        <div v-else class="d-flex flex-column flex-grow-1 align-self-stretch">
+
+        <div v-else class="d-flex flex-column flex-grow-1 align-self-stretch messages-container">
           <template v-for="(message, i) in state.messages">
-            <div v-if="message.id === firstUnreadMessage?.id" class="new-messages-indicator">
+            <div
+              v-if="message.id === firstUnreadMessage?.id"
+              class="new-messages-indicator"
+              data-html2canvas-ignore
+            >
               New Messages
             </div>
-            <Message :conversation-id="id" :message="message" />
+
+            <Message :id="'message-' + message.id" :conversation-id="id" :message="message" />
           </template>
         </div>
         <div class="bottom" v-intersect="onBottomIntersect" />
@@ -41,7 +57,9 @@
 
 <script setup lang="ts">
 import Message from "./Message.vue";
-import { useMessagingStore, Message as MessageType, Direction } from "../../stores/messaging";
+import { Message as MessageType, Direction } from "../../types/messaging";
+import { useMessagingStore } from "../../stores/messaging";
+import { formatPhoneNumber } from "../../lib/formatters";
 import {
   computed,
   reactive,
@@ -55,9 +73,13 @@ import {
 } from "vue";
 import { useLayout } from "vuetify";
 import MessageInput from "./MessageInput.vue";
+import ConversationDownloadButton from "./ConversationDownloadButton.vue";
+import ClientInfoButton from "./ClientInfoButton.vue";
+import ConversationLabelButton from "./ConversationLabelButton.vue";
 
 interface Props {
   id: string;
+  messageId?: string;
 }
 
 const props = defineProps<Props>();
@@ -73,8 +95,8 @@ const mainStyles: Ref<CSSProperties> = computed(() => ({
 
 const initialLoad = ref(true);
 const bottomVisible = ref(false);
-const messageContainer: Ref<ComponentPublicInstance | null> = ref(null);
-const firstUnreadMessage: Ref<MessageType | null> = ref(null);
+const messageContainer = ref<ComponentPublicInstance | null>(null);
+const firstUnreadMessage = ref<MessageType | null>(null);
 
 const state = reactive({
   conversation: messagingStore.getConversation(id.value),
@@ -84,6 +106,10 @@ const state = reactive({
 const messagesLoading = computed(() => state.messages === undefined);
 
 const conversationNotFound = computed(() => state.conversation === null);
+
+const formattedClientNumber = computed(() =>
+  formatPhoneNumber(state.conversation?.client?.phoneNumber ?? ""),
+);
 
 const lastMessage = computed(() => {
   if (state.messages?.length) {
@@ -144,7 +170,9 @@ watch(
       firstUnreadMessage.value = findFirstUnreadMessage();
       initialLoad.value = false;
 
-      if (firstUnreadMessage.value) {
+      if (props.messageId) {
+        scrollTo(`#message-${props.messageId}`);
+      } else if (firstUnreadMessage.value) {
         scrollToFirstUnreadMessage();
       } else {
         scrollToBottom();

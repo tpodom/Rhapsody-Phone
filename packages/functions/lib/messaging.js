@@ -110,7 +110,7 @@ async function pickConversationForMessage(phoneNumber) {
     if (rhapsodyClient) {
       logger.debug(`Received a new message from client ${rhapsodyClient.id}`);
       client.id = rhapsodyClient.id;
-      client.name = `${rhapsodyClient.firstName} ${rhapsodyClient.lastName}`;
+      client.name = rhapsodyClient.displayName;
     }
   } catch (err) {
     logger.error(`Error looking up client by phone number ${phoneNumber}.`, err);
@@ -137,9 +137,10 @@ async function pickConversationForMessage(phoneNumber) {
   const newConversationData = {
     id: generateId(),
     deleted: false,
+    errorCount: 0,
     unreadCount: 0,
     timestamp: new Date(),
-    tags: [],
+    labels: [],
     client,
   };
 

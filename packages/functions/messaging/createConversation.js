@@ -16,8 +16,10 @@ exports.createConversation = functions.https.onCall(async ({ clientId, phoneNumb
     );
   }
 
-  let clientPhoneNumber;
-  let clientName;
+  let clientPhoneNumber = null;
+  let clientName = null;
+
+  logger.info(`createConversation for ${clientId}, ${phoneNumber}`);
 
   if (clientId) {
     const client = await getClient(clientId);
@@ -29,14 +31,13 @@ exports.createConversation = functions.https.onCall(async ({ clientId, phoneNumb
       );
     }
 
-    // TODO normalize this when we sync and make it smarter
-    clientName = `${client.firstName} ${client.lastName}`;
-    clientPhoneNumber = client.mobilePhone;
+    logger.debug(`Found client for id ${clientId}`, client.data());
+    clientName = client.data().displayName;
+    clientPhoneNumber = client.data().mobilePhone;
   }
 
   if (phoneNumber) {
     clientPhoneNumber = normalizePhoneNumber(phoneNumber);
-    clientName = null;
 
     if (!clientPhoneNumber) {
       throw new functions.https.HttpsError(
@@ -60,11 +61,13 @@ exports.createConversation = functions.https.onCall(async ({ clientId, phoneNumb
     const result = await upsertConversation({
       id: conversationId,
       deleted: false,
+      errorCount: 0,
       unreadCount: 0,
       latestMessage: null,
       timestamp: new Date(),
-      tags: [],
+      labels: [],
       client: {
+        id: clientId ?? null,
         name: clientName,
         phoneNumber: clientPhoneNumber,
       },

@@ -1,0 +1,10 @@
+{
+  "name": "clients",
+  "fields": [
+    { "name": "name", "type": "string" },
+    { "name": "timestamp", "type": "int64" },
+    { "name": "phone_number", "type": "string[]" }
+  ],
+  "token_separators": ["(", ")", "-"],
+  "default_sorting_field": "timestamp"
+}

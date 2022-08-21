@@ -5,7 +5,7 @@ import { mount, VueWrapper } from "@vue/test-utils";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createTestingPinia } from "@pinia/testing";
 
-import CallList from "./CallList.vue";
+import CallList from "../CallList.vue";
 
 describe("CallList", () => {
   let wrapper: VueWrapper;

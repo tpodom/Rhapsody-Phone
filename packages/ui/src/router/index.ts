@@ -36,8 +36,12 @@ const routes = [
       },
       {
         path: ":id",
+        name: "Conversation",
         component: Conversation,
-        props: (route: RouteLocationNormalized) => ({ id: route.params.id }),
+        props: (route: RouteLocationNormalized) => ({
+          id: route.params.id,
+          messageId: route.query.messageId,
+        }),
       },
     ],
   },

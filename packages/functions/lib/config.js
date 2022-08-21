@@ -10,6 +10,16 @@ const config = {
     messagingApiBaseUrl: "https://api.jive.com/messaging",
     channelName: process.env.GOTO_CONNECT_CHANNEL_NAME || "vet-connect",
   },
+  typesense: {
+    hosts: (process.env.TYPESENSE_HOSTS || "")
+      .split(",")
+      .map((host) => host.trim())
+      .filter((host) => !!host),
+    port: process.env.TYPESENSE_PORT || "443",
+    protocol: process.env.TYPESENSE_PROTOCOL || "https",
+    apiKey: process.env.TYPESENSE_API_KEY,
+    backfillBatchSize: 1000,
+  },
 };
 
 module.exports = config;

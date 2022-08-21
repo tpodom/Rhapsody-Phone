@@ -30,5 +30,9 @@ service cloud.firestore {
     match /conversations/{document=**} {
       allow read, write: if isAuthenticated()
     }
+    match /labels/{document=**} {
+      allow read: if isAuthenticated()
+      allow write: if isAdmin()
+    }
   }
 }

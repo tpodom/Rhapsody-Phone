@@ -1,5 +1,5 @@
 <template>
-  <div class="unread-indicator"></div>
+  <div class="unread-indicator" />
 </template>
 
 <style lang="scss" scoped>

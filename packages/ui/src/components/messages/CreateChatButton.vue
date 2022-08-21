@@ -1,12 +1,7 @@
 <template>
   <v-dialog persistent v-model="dialogOpen" max-width="600">
     <template v-slot:activator="{ props }">
-      <v-btn
-        rounded
-        class="mt-3 ml-3 mr-3 mb-1 align-self-start"
-        color="primary"
-        v-bind="props"
-      >
+      <v-btn rounded class="mt-3 ml-3 mr-3 mb-1 align-self-start" color="primary" v-bind="props">
         <v-icon icon="mdi-message-outline" /> New Chat
       </v-btn>
     </template>
@@ -14,19 +9,23 @@
       <v-card-title>
         <span class="text-h5">Start Conversation</span>
       </v-card-title>
+      <v-divider />
       <v-card-text>
         <p class="mb-3">
-          Start a new conversation by entering the phone number of the client you want to message.
+          Start a new conversation by selecting a client and entering the phone number you want to
+          message.
         </p>
 
-        <p v-if="errorMessage" class="mb-3 error">
+        <div v-if="errorMessage" class="mb-3 error">
           <div>There was an error creating the new conversation:</div>
           <ul class="ml-8">
             <li>{{ errorMessage }}</li>
           </ul>
-        </p>
+        </div>
 
         <v-form v-model="valid">
+          <ClientsAutocomplete @selected="selectedClient = $event" />
+
           <v-text-field
             v-model="phoneNumber"
             type="tel"
@@ -47,9 +46,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import { useMessagingStore } from "../../stores/messaging";
+import { ref, watch, Ref } from "vue";
 import { useRouter } from "vue-router";
+import { useMessagingStore } from "../../stores/messaging";
+import type { ClientSearchRecord } from "../../types/clients";
+import { formatPhoneNumber } from "../../lib/formatters";
+import ClientsAutocomplete from "../ClientsAutocomplete.vue";
 
 const REGEX_FORMATTING_CHARS = /[\(\)\-\.\s]/g;
 
@@ -61,6 +63,7 @@ const valid = ref(false);
 const creating = ref(false);
 const errorMessage = ref("");
 const phoneNumber = ref("");
+const selectedClient: Ref<ClientSearchRecord | undefined> = ref();
 
 const phoneNumberRules = [
   (input: any): string | true => !!input || "Phone number is required",
@@ -76,7 +79,12 @@ const onCreate = async () => {
   try {
     creating.value = true;
     errorMessage.value = "";
-    const conversation = await messagingStore.createConversation(null, phoneNumber.value);
+
+    const conversation = await messagingStore.createConversation(
+      selectedClient.value?.id ?? null,
+      phoneNumber.value,
+    );
+
     await router.push(`/messages/${conversation.id}`);
     dialogOpen.value = false;
   } catch (err) {
@@ -86,18 +94,30 @@ const onCreate = async () => {
   }
 };
 
+watch(selectedClient, (newVal) => {
+  if (newVal?.mobile_phone_number) {
+    phoneNumber.value = formatPhoneNumber(newVal?.mobile_phone_number);
+  }
+});
+
 watch(dialogOpen, (newVal) => {
   if (!newVal) {
+    selectedClient.value = undefined;
     phoneNumber.value = "";
     errorMessage.value = "";
     creating.value = false;
     valid.value = false;
+  } else {
   }
 });
 </script>
 
 <style lang="scss" scoped>
 .error {
-    color: rgb(var(--v-theme-error));
+  color: rgb(var(--v-theme-error));
+}
+
+.autocomplete-segment {
+  white-space: pre;
 }
 </style>

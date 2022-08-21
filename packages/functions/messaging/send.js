@@ -102,6 +102,7 @@ exports.sendMessage = functions
       direction: "OUT",
       sentStatus: "SENDING",
       read: true,
+      client: conversationSnapshot.data().client,
     };
 
     return messaging.send(conversationSnapshot, message);

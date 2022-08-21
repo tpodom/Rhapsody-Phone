@@ -7,3 +7,4 @@ firebase-export/
 .firebase
 
 *debug.log
+.secret.local

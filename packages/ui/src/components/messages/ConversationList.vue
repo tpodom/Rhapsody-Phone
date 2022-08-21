@@ -23,7 +23,6 @@
 <script setup lang="ts">
 import { useMessagingStore } from "../../stores/messaging";
 import ConversationListItem from "./ConversationListItem.vue";
-import CreateChatButtonVue from "./CreateChatButton.vue";
 import CreateChatButton from "./CreateChatButton.vue";
 
 const messagingStore = useMessagingStore();

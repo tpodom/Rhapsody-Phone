@@ -24,7 +24,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useMessagingStore, Conversation, Message } from "../../stores/messaging";
+import type { Conversation, Message } from "../../types/messaging";
+import { useMessagingStore } from "../../stores/messaging";
 import { computed, ref, toRefs } from "vue";
 import { useTheme } from "vuetify";
 import { VuemojiPicker, EmojiClickEventDetail } from "vuemoji-picker";
@@ -39,7 +40,7 @@ interface Emits {
   (eventName: "message-sent", message: Message): void;
 }
 
-const emits = defineEmits<Emits>();
+const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const { conversation } = toRefs(props);
 
@@ -70,7 +71,7 @@ const sendMessage = async () => {
         [],
       );
 
-      emits("message-sent", result);
+      emit("message-sent", result);
     }
 
     messageToSend.value = "";

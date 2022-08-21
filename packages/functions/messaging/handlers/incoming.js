@@ -21,6 +21,7 @@ exports.incoming = async (webhookMessage) => {
     timestamp: new Date(timestamp),
     direction: "IN",
     read: false,
+    client: conversationSnapshot.data().client,
   };
 
   try {

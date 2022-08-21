@@ -55,3 +55,7 @@ export function formatRelativeAppointmentTime(
 
   return formatter.format(date);
 }
+
+export function formatFilenameDate(date: Date): string {
+  return dayjs(date).format("YYYY-MM-DD");
+}
