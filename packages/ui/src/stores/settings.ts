@@ -21,8 +21,8 @@ export const useSettingsStore = defineStore("settings", () => {
   const router = useRouter();
   const popupWindow = usePopupWindow();
 
-  const gotoConnectSettings = useFirestore(doc(firestore, "settings", "gotoConnect"));
-  const rhapsodySettings = useFirestore(doc(firestore, "settings", "rhapsody"));
+  const { snapshot: gotoConnectSettings } = useFirestore(doc(firestore, "settings", "gotoConnect"));
+  const { snapshot: rhapsodySettings } = useFirestore(doc(firestore, "settings", "rhapsody"));
 
   // The doc will start out as undefined initially and will resolve as null or an object
   const gotoConnectLoading = computed(() => gotoConnectSettings.value === undefined);
@@ -62,6 +62,10 @@ export const useSettingsStore = defineStore("settings", () => {
     return httpsCallable<void, void>(functions, "syncRhapsody")();
   }
 
+  async function syncSearch() {
+    return httpsCallable<void, void>(functions, "syncSearch")();
+  }
+
   return {
     gotoConnectSettings,
     rhapsodySettings,
@@ -71,5 +75,6 @@ export const useSettingsStore = defineStore("settings", () => {
     disconnectGoToConnect,
     syncGoToConnect,
     syncRhapsody,
+    syncSearch,
   };
 });

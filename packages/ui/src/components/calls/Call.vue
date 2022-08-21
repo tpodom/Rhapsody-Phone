@@ -1,7 +1,7 @@
 <template>
-  <RhapsodyClientCall
+  <ClientCall
     v-if="props.call.rhapsodyClientId"
-    :rhapsody-client-id="props.call.rhapsodyClientId"
+    :client-id="props.call.rhapsodyClientId"
     :call-icon="callIcon"
     :phone-number="formattedPhoneNumber"
   />
@@ -17,10 +17,10 @@
 
 <script setup lang="ts">
 import { VIcon } from "vuetify/components";
-import { computed, watch, ref } from "vue";
-import RhapsodyClientCall from "./RhapsodyClientCall.vue";
-import { formatPhoneNumber } from "../lib/formatters";
-import { Call } from "../stores/calls";
+import { computed } from "vue";
+import ClientCall from "./ClientCall.vue";
+import { formatPhoneNumber } from "../../lib/formatters";
+import { Call } from "../../types/calls";
 
 interface Props {
   call: Call;
@@ -45,7 +45,7 @@ const formattedPhoneNumber = computed(() => {
 });
 </script>
 
-<style>
+<style lang="scss">
 .mdi-phone-ring {
   color: red;
 }

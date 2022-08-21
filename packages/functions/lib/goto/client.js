@@ -1,6 +1,7 @@
 const got = require("got");
 const { loadAccessToken } = require("./oauth");
 const { AuthenticationError } = require("../errors");
+const FormData = require("form-data");
 const config = require("../config");
 
 const MAX_PAGES = 10;
@@ -184,6 +185,37 @@ class Client {
           channelId,
         },
       })
+      .json();
+  }
+
+  /**
+   * Sends an SMS message to a customer.
+   *
+   * @param {string} ownerPhoneNumber E164 phone number to send message from
+   * @param {string} clientPhoneNumber E164 phone number to send message to
+   * @param {string} body Message body to send to customer.
+   * @param {object[]} files List of storage files to send.
+   *
+   * @return {Promise<object>}
+   */
+  sendMessage(ownerPhoneNumber, clientPhoneNumber, body, files) {
+    const form = new FormData();
+    form.append("ownerPhoneNumber", ownerPhoneNumber);
+    form.append("contactPhoneNumbers", clientPhoneNumber);
+    form.append("body", body || "");
+
+    if (files && files.length) {
+      for (const file of files) {
+        form.append("file", null, {
+          filename: file.filename,
+          contentType: file.contentType,
+          knownLength: file.size,
+        });
+      }
+    }
+
+    return this.got
+      .post(`${config.gotoConnect.messagingApiBaseUrl}/v1/messages`, { body: form })
       .json();
   }
 

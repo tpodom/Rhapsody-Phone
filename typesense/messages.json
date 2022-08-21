@@ -1,0 +1,12 @@
+{
+  "name": "messages",
+  "fields": [
+    { "name": "body", "type": "string" },
+    { "name": "timestamp", "type": "int64" },
+    { "name": "conversationId", "type": "string", "facet": true },
+    { "name": "client.name", "type": "string" },
+    { "name": "client.phone_number", "type": "string[]" },
+    { "name": "labels", "type": "string[]" }
+  ],
+  "default_sorting_field": "timestamp"
+}

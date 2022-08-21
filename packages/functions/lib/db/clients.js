@@ -6,7 +6,7 @@ const { db } = require("../init");
  * @param {string} phoneNumber E.164 formatted phone number
  * @return {Promise<object | null>} Promise that resolves to a matching client or null if not found.
  */
-exports.findClientByPhone = async (phoneNumber) => {
+async function findClientByPhone(phoneNumber) {
   // Search through to see if we find a match on any of the possible phone fields. Firestore
   // doesn't have a way to query on multiple fields with OR logic.
   const phoneFields = ["mobilePhone", "homePhone", "homePhoneNew", "workPhone", "otherPhone"];
@@ -17,22 +17,31 @@ exports.findClientByPhone = async (phoneNumber) => {
     }
   }
   return null;
-};
+}
 
 /**
  * Retrieves a single client.
  *
  * @param {string} clientId Client ID
- * @return {Promise<object | null>} Client data if found or null if it does not exist
+ * @return {Promise<DocumentSnapshot | null>} Client data if found or null if it does not exist
  */
-exports.getClient = async (clientId) => {
-  const clientRef = await getClientsCollectionRef().doc(clientId).get();
+async function getClient(clientId) {
+  const clientSnapshot = await getClientsCollectionRef().doc(clientId).get();
 
-  if (clientRef.exists) {
-    return clientRef.data();
+  if (clientSnapshot.exists) {
+    return clientSnapshot;
   }
   return null;
-};
+}
+
+/**
+ * Returns a query snapshot of all clients.
+ *
+ * @return {Promise<QuerySnapshot>} Query of all clients
+ */
+async function getClientsQuerySnapshot() {
+  return getClientsCollectionRef().get();
+}
 
 /**
  * Adds or updates a client
@@ -40,12 +49,17 @@ exports.getClient = async (clientId) => {
  * @param {object} client Rhapsody client data
  * @return {Promise<void>}
  */
-exports.upsertClient = async (client) => {
+async function upsertClient(client) {
   const { patients, ...clientData } = client;
   const clientRef = getClientsCollectionRef().doc(client.id);
   await clientRef.set(clientData, { merge: true });
-  await updatePets(clientRef, patients);
-};
+
+  if (patients) {
+    await updatePets(clientRef, patients);
+  }
+
+  return clientRef.get();
+}
 
 /**
  * Retrieves a single pet for a client.
@@ -54,15 +68,15 @@ exports.upsertClient = async (client) => {
  * @param {string} petId Rhapsody patient ID
  * @return {Promise<object | null>} Pet record or null if it does not exist
  */
-exports.getPet = async (clientId, petId) => {
+async function getPet(clientId, petId) {
   const clientRef = getClientsCollectionRef().doc(clientId);
   const petRef = await getClientPetsCollectionRef(clientRef).doc(petId).get();
 
   if (petRef.exists) {
-    return petRef.data();
+    return petRef;
   }
   return null;
-};
+}
 
 /**
  * Adds or updates pet information.
@@ -71,11 +85,12 @@ exports.getPet = async (clientId, petId) => {
  * @param {object} pet Pet data
  * @return {Promise<object>} Updated pet
  */
-exports.upsertPet = async (clientId, pet) => {
+async function upsertPet(clientId, pet) {
   const clientRef = getClientsCollectionRef().doc(clientId);
   const petRef = getClientPetsCollectionRef(clientRef).doc(pet.id);
-  return petRef.set(convertDates(pet, "dateOfBirth"), { merge: true });
-};
+  await petRef.set(convertDates(pet, "dateOfBirth"), { merge: true });
+  return petRef.get();
+}
 
 /**
  * Adds or updates appointment information.
@@ -84,13 +99,14 @@ exports.upsertPet = async (clientId, pet) => {
  * @param {object} appointment Appointment data
  * @return {Promise<object>} Updated appointment
  */
-exports.upsertAppointment = async (clientId, appointment) => {
+async function upsertAppointment(clientId, appointment) {
   const clientRef = getClientsCollectionRef().doc(clientId);
   const appointmentRef = getClientAppointmentsCollectionRef(clientRef).doc(appointment.id);
 
   const data = convertDates(appointment, "scheduledStartDatetime", "scheduledEndDatetime");
-  return appointmentRef.set(data, { merge: true });
-};
+  await appointmentRef.set(data, { merge: true });
+  return appointmentRef.get();
+}
 
 /**
  * Updates client's pets list.
@@ -160,3 +176,11 @@ function convertDates(obj, ...fields) {
 
   return data;
 }
+
+exports.findClientByPhone = findClientByPhone;
+exports.getClient = getClient;
+exports.getClientsQuerySnapshot = getClientsQuerySnapshot;
+exports.upsertClient = upsertClient;
+exports.getPet = getPet;
+exports.upsertPet = upsertPet;
+exports.upsertAppointment = upsertAppointment;

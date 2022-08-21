@@ -4,13 +4,13 @@ const { AuthenticationError } = require("../errors");
 const settings = require("../db/gotoSettings");
 const config = require("../config");
 
-const CHANNEL_NAME = "vet-connect";
+const CHANNEL_NAME = config.gotoConnect.channelName;
 
 /**
  * Subscribes to GoTo Connect webhooks (calls and SMS).
  */
 async function updateWebhooks() {
-  const gotoSettings = await settings.getSettings();
+  const gotoSettings = await settings.getSettingsData();
 
   if (!gotoSettings?.accountKey) {
     logger.info("Skipping update, GoTo Connect is not configured.");

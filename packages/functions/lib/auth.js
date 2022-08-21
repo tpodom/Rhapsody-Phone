@@ -24,6 +24,16 @@ exports.validateIsAdmin = (token) => {
 };
 
 /**
+ * Ensures the user is authenticated. Throws an error if not.
+ *
+ * @param {IdToken} token ID token
+ */
+exports.validateIsAuthenticated = (token) => {
+  if (!token) {
+    throw new functions.https.HttpsError("permission-denied", "You are not authorized.");
+  }
+};
+/**
  * Creates an express middleware that validates auth status.
  *
  * @param {string | undefined} requiredClaim Required claim to check for on the token

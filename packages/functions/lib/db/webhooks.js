@@ -38,9 +38,9 @@ async function getEvent(eventType, eventId) {
  * @return {Promise<void>}
  */
 async function saveEvent(eventType, eventId, data = {}) {
-  return getEventCollection(eventType)
-    .doc(eventId)
-    .set({ ...data, createdAt: new Date() });
+  const eventRef = getEventCollection(eventType).doc(eventId);
+  await eventRef.set({ ...data, createdAt: new Date() });
+  return eventRef.get();
 }
 
 /**

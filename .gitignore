@@ -1,4 +1,5 @@
 node_modules/
+firebase-export/
 .vscode/
 .env.local
 
@@ -6,3 +7,4 @@ node_modules/
 .firebase
 
 *debug.log
+.secret.local

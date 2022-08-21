@@ -1,7 +1,11 @@
 <template>
-  <div v-if="loading"><v-progress-circular indeterminate color="primary" /> Connecting...</div>
-  <div v-else-if="error">{{ error }}</div>
-  <div v-else>Successfully connected to GoTo Connect. You may safely close this window.</div>
+  <v-main>
+    <v-container fluid>
+      <div v-if="loading"><v-progress-circular indeterminate color="primary" /> Connecting...</div>
+      <div v-else-if="error">{{ error }}</div>
+      <div v-else>Successfully connected to GoTo Connect. You may safely close this window.</div>
+    </v-container>
+  </v-main>
 </template>
 <script setup lang="ts">
 import { ref, Ref } from "vue";

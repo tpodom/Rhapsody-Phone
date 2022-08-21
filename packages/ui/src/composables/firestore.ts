@@ -5,8 +5,9 @@ import type {
   DocumentSnapshot,
 } from "firebase/firestore";
 import { onSnapshot, DocumentReference } from "firebase/firestore";
-import { ref, Ref } from "vue";
+import { reactive, ref, Ref } from "vue";
 import { isDef, tryOnScopeDispose } from "@vueuse/core";
+import { Unsubscribe } from "firebase/app-check";
 
 export interface FirestoreOptions {
   errorHandler?: (err: Error) => void;
@@ -14,6 +15,22 @@ export interface FirestoreOptions {
 }
 
 export type FirebaseDocRef<T> = Query<T> | DocumentReference<T>;
+
+export interface FirestoreListener {
+  stop: () => void;
+}
+
+export interface FirestoreDocRefListener<T extends DocumentData> extends FirestoreListener {
+  snapshot: Ref<T | undefined | null>;
+  updateDocRef(docRef: DocumentReference<T>): void;
+}
+
+export interface FirestoreQueryListener<T extends DocumentData> extends FirestoreListener {
+  snapshot: Ref<T[] | undefined>;
+  updateQuery(query: Query<T>): void;
+}
+
+export type FirebaseListener<T> = FirestoreDocRefListener<T> | FirestoreQueryListener<T>;
 
 function getData<T>(docRef: DocumentSnapshot<T> | QueryDocumentSnapshot<T>) {
   const data = docRef.data();
@@ -28,28 +45,18 @@ function getData<T>(docRef: DocumentSnapshot<T> | QueryDocumentSnapshot<T>) {
   return data;
 }
 
-export function useFirestore<T extends DocumentData>(
-  docRef: DocumentReference<T>,
-  initialValue: T,
-  options?: FirestoreOptions,
-): Ref<T | null>;
-export function useFirestore<T extends DocumentData>(
-  docRef: Query<T>,
-  initialValue: T[],
-  options?: FirestoreOptions,
-): Ref<T[]>;
-
 // nullable initial values
 export function useFirestore<T extends DocumentData>(
   docRef: DocumentReference<T>,
   initialValue?: T | undefined,
   options?: FirestoreOptions,
-): Ref<T | undefined | null>;
+): FirestoreDocRefListener<T>;
+
 export function useFirestore<T extends DocumentData>(
   docRef: Query<T>,
   initialValue?: T[],
   options?: FirestoreOptions,
-): Ref<T[] | undefined>;
+): FirestoreQueryListener<T>;
 
 /**
  * Reactive Firestore binding. Making it straightforward to always keep your
@@ -64,45 +71,72 @@ export function useFirestore<T extends DocumentData>(
   docRef: FirebaseDocRef<T>,
   initialValue: any = undefined,
   options: FirestoreOptions = {},
-) {
+): FirebaseListener<T> {
   const {
     // eslint-disable-next-line no-console
     errorHandler = (err: Error) => console.error(err),
     autoDispose = true,
   } = options;
 
-  if (docRef instanceof DocumentReference) {
-    const data = ref(initialValue) as Ref<T | null | undefined>;
+  let close: Unsubscribe | undefined;
 
-    const close = onSnapshot(
-      docRef,
-      (snapshot: DocumentSnapshot<T>) => {
-        data.value = getData(snapshot) || null;
-      },
-      errorHandler,
-    );
-
-    tryOnScopeDispose(() => {
+  const stop = () => {
+    if (close) {
       close();
-    });
+      close = undefined;
+    }
+  };
 
-    return data;
+  if (docRef instanceof DocumentReference) {
+    const snapshotRef: Ref<T | null | undefined> = ref(initialValue);
+
+    const updateDocRef = (newDocRef: DocumentReference<T>) => {
+      stop();
+
+      close = onSnapshot(
+        newDocRef,
+        (snapshot: DocumentSnapshot<T>) => {
+          snapshotRef.value = getData(snapshot) || null;
+        },
+        errorHandler,
+      );
+    };
+
+    updateDocRef(docRef);
+    if (autoDispose) {
+      tryOnScopeDispose(stop);
+    }
+
+    return {
+      snapshot: snapshotRef,
+      stop,
+      updateDocRef,
+    };
   } else {
-    const data = ref(initialValue) as Ref<T[] | undefined>;
+    const snapshotRef: Ref<T[] | undefined> = ref(initialValue);
 
-    const close = onSnapshot(
-      docRef,
-      (snapshot) => {
-        data.value = snapshot.docs.map(getData).filter(isDef);
-      },
-      errorHandler,
-    );
+    const updateQuery = (newQuery: Query<T>) => {
+      stop();
+
+      close = onSnapshot(
+        newQuery,
+        (snapshot) => {
+          snapshotRef.value = snapshot.docs.map(getData).filter(isDef);
+        },
+        errorHandler,
+      );
+    };
+
+    updateQuery(docRef);
 
     if (autoDispose) {
-      tryOnScopeDispose(() => {
-        close();
-      });
+      tryOnScopeDispose(stop);
     }
-    return data;
+
+    return {
+      snapshot: snapshotRef,
+      stop,
+      updateQuery,
+    };
   }
 }

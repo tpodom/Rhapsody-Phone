@@ -14,43 +14,9 @@ import {
 import { useFirestore } from "../composables/firestore";
 import type { Ref } from "vue";
 import LRU from "lru-cache";
-
-export interface Client {
-  id: string;
-  firstName: string;
-  lastName: string;
-  balance: number;
-}
-
-export enum Gender {
-  FEMALE = "FEMALE",
-  MALE = "MALE",
-}
-
-export enum SpayedNeuteredStatus {
-  SPAYED = "SPAYED",
-  NEUTERED = "NEUTERED",
-  INTACT = "INTACT",
-}
-
-export interface Pet {
-  id: string;
-  name: string;
-  gender: Gender;
-  spayedNeuteredStatus: SpayedNeuteredStatus;
-  deleted: boolean;
-  deceased: boolean;
-}
-
-export interface Appointment {
-  id: string;
-  type: {
-    name: string;
-  };
-  scheduledStartDatetime: Timestamp;
-  patientId: string;
-  deleted: boolean;
-}
+import type { SearchResult } from "../types/search";
+import * as search from "../lib/search";
+import type { Appointment, Client, ClientSearchRecord, Pet } from "../types/clients";
 
 enum SortDirection {
   DESC = "desc",
@@ -79,7 +45,8 @@ function recentAppointmentQuery(
       limit(1),
     );
 
-    cache.set(clientId, useFirestore<Appointment>(appointmentQuery));
+    const { snapshot } = useFirestore<Appointment>(appointmentQuery);
+    cache.set(clientId, snapshot);
   }
   return cache.get(clientId)!;
 }
@@ -97,7 +64,8 @@ export const useClientsStore = defineStore("clients", () => {
   const getClient = (id: string): Ref<Client | null | undefined> => {
     if (!clientCache.has(id)) {
       const docRef = doc(firestore, "clients", id) as DocumentReference<Client>;
-      clientCache.set(id, useFirestore<Client>(docRef));
+      const { snapshot } = useFirestore<Client>(docRef);
+      clientCache.set(id, snapshot);
     }
     return clientCache.get(id)!;
   };
@@ -108,7 +76,8 @@ export const useClientsStore = defineStore("clients", () => {
         doc(firestore, "clients", clientId),
         "pets",
       ) as CollectionReference<Pet>;
-      petCache.set(clientId, useFirestore<Pet>(petsRef));
+      const { snapshot } = useFirestore<Pet>(petsRef);
+      petCache.set(clientId, snapshot);
     }
     return petCache.get(clientId)!;
   };
@@ -121,10 +90,25 @@ export const useClientsStore = defineStore("clients", () => {
     return recentAppointmentQuery(nextAppointmentCache, clientId, SortDirection.ASC);
   };
 
+  const typeaheadSearch = (queryString: string): Promise<SearchResult<ClientSearchRecord>> => {
+    if (!search.isConfigured()) {
+      throw new Error("Search is not enabled.");
+    }
+
+    const searchParameters = {
+      q: queryString,
+      query_by: "name",
+      sort_by: "timestamp:desc",
+    };
+
+    return search.query("clients", searchParameters);
+  };
+
   return {
     getClient,
     getPets,
     findLastAppointment,
     findNextAppointment,
+    typeaheadSearch,
   };
 });

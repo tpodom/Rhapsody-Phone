@@ -1,9 +1,9 @@
 const callQueueStore = require("../../lib/db/callQueue");
-const { parseNumber } = require("../../lib/phone");
+const { normalizePhoneNumber } = require("../../lib/phone");
 const { logger } = require("../../lib/init");
 
 exports.hangup = async (data) => {
-  const normalizedNumber = parseNumber(data.caller.number);
+  const normalizedNumber = normalizePhoneNumber(data.caller.number || data.caller.number);
   const activeCall = await callQueueStore.findActiveCall(normalizedNumber);
 
   if (!activeCall.empty) {

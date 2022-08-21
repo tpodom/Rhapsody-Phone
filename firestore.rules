@@ -18,7 +18,7 @@ service cloud.firestore {
     match /call_webhook_events/{document=**} {
       allow read, write: if isAdmin();
     }
-    match /mesasging_webhook_events/{document=**} {
+    match /messaging_webhook_events/{document=**} {
       allow read, write: if isAdmin();
     }
     match /clients/{document=**} {
@@ -26,6 +26,13 @@ service cloud.firestore {
     }
     match /call_queue/{document=**} {
       allow read, write: if isAuthenticated()
+    }
+    match /conversations/{document=**} {
+      allow read, write: if isAuthenticated()
+    }
+    match /labels/{document=**} {
+      allow read: if isAuthenticated()
+      allow write: if isAdmin()
     }
   }
 }

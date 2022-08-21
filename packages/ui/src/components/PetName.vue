@@ -9,12 +9,14 @@
 
 <script setup lang="ts">
 import { VIcon } from "vuetify/components";
-import { Gender, Pet, SpayedNeuteredStatus } from "../stores/clients";
+import { Gender, SpayedNeuteredStatus } from "../types/clients";
+import type { Pet } from "../types/clients";
 import { computed } from "vue";
+import { getPatientLink } from "../lib/rhapsody";
 
 interface Props {
   pet: Pet;
-  rhapsodyClientId: string;
+  clientId: string;
 }
 
 const genderIcons = {
@@ -28,9 +30,7 @@ const genderColors = {
 };
 
 const props = defineProps<Props>();
-const rhapsodyLink = computed(
-  () => `https://portal.rhapsody.vet/client/${props.rhapsodyClientId}/patient/${props.pet.id}`,
-);
+const rhapsodyLink = computed(() => getPatientLink(props.clientId, props.pet.id));
 </script>
 
 <style lang="scss" scoped>

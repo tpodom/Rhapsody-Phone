@@ -5,14 +5,14 @@ const { db } = require("../init");
  *
  * @return {Promise<object>} Current value of Rhapsody settings
  */
-exports.getSettings = async () => {
+async function getSettingsData() {
   const settingsSnap = await getSettingsDoc().get();
 
   if (settingsSnap.exists) {
     return settingsSnap.data();
   }
   return {};
-};
+}
 
 /**
  * Updates the last sync time for Rhapsody.
@@ -20,10 +20,10 @@ exports.getSettings = async () => {
  * @param {DateTime} lastSyncTime Last sync time
  * @return {Promise<object>} Updated settings
  */
-exports.updateLastSyncTime = async (lastSyncTime) => {
+async function updateLastSyncTime(lastSyncTime) {
   await getSettingsDoc().set({ lastSyncTime }, { merge: true });
-  return exports.getSettings();
-};
+  return getSettingsData();
+}
 
 /**
  * Updates the Rhapsody business info
@@ -31,10 +31,10 @@ exports.updateLastSyncTime = async (lastSyncTime) => {
  * @param {object} business The business id and name
  * @return {Promise<object>} Updated settings
  */
-exports.updateBusiness = async (business) => {
+async function updateBusiness(business) {
   await getSettingsDoc().set({ business }, { merge: true });
-  return exports.getSettings();
-};
+  return getSettingsData();
+}
 
 /**
  * Builds reference to GoTo settings document.
@@ -44,3 +44,7 @@ exports.updateBusiness = async (business) => {
 function getSettingsDoc() {
   return db.collection("settings").doc("rhapsody");
 }
+
+exports.getSettingsData = getSettingsData;
+exports.updateLastSyncTime = updateLastSyncTime;
+exports.updateBusiness = updateBusiness;

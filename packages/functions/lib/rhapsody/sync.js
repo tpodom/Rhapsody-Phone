@@ -1,6 +1,6 @@
 const { createClient } = require("./client");
 const {
-  getSettings,
+  getSettingsData,
   updateBusiness,
   updateLastSyncTime,
 } = require("../../lib/db/rhapsodySettings");
@@ -17,7 +17,7 @@ const IGNORED_APPOINTMENT_TYPES = ["OTC Sale"];
  */
 exports.sync = async (apiKey) => {
   const client = createClient(apiKey);
-  let settings = await getSettings();
+  let settings = await getSettingsData();
 
   try {
     if (!settings.business) {
@@ -48,12 +48,19 @@ async function syncClients(client, settings) {
     settings.business.id,
     settings.lastSyncTime ? settings.lastSyncTime.toDate() : undefined,
   );
+
   for (const clientRecord of clients) {
     try {
       logger.debug(
         `Syncing client ${clientRecord.id} - ${clientRecord.lastName}, ${clientRecord.firstName}`,
       );
-      await clientsStore.upsertClient(clientRecord);
+
+      clientRecord.displayName = [
+        (clientRecord.firstName || "").trim(),
+        (clientRecord.lastName || "").trim(),
+      ].join(" ");
+
+      await clientsStore.upsertClient({ ...clientRecord, timestamp: new Date() });
     } catch (error) {
       logger.error(
         `Failed to sync client ${clientRecord.id} - ${clientRecord.lastName}, ${clientRecord.firstName}: ${error.message}`,
@@ -82,25 +89,32 @@ async function syncAppointments(client, settings) {
         );
         continue;
       }
+
       logger.debug(
         `Found appointment ${appointment.id} for client ${appointment.clientId} at ${appointment.scheduledStartDatetime}`,
       );
+
       let clientRecord = await clientsStore.getClient(appointment.clientId);
+
       if (!clientRecord) {
         logger.info(`Client ${appointment.clientId} was not found, syncing them now.`);
         clientRecord = await client.getClient(appointment.clientId);
-        clientRecord = await clientsStore.upsertClient(clientRecord);
+        clientRecord = await clientsStore
+          .upsertClient({ ...clientRecord, timestamp: new Date() })
+          .data();
       }
 
       let petRecord = await clientsStore.getPet(appointment.clientId, appointment.patientId);
+
       if (!petRecord) {
         logger.info(
           `Pet ${appointment.patientId} for client ${appointment.clientId} was not found, syncing them now.`,
         );
         petRecord = await client.getPet(appointment.patientId);
-        petRecord = await clientsStore.upsertPet(appointment.clientId, petRecord);
+        petRecord = await clientsStore.upsertPet(appointment.clientId, petRecord).data();
       }
 
+      await clientsStore.upsertClient({ id: appointment.clientId, timestamp: new Date() });
       await clientsStore.upsertAppointment(appointment.clientId, appointment);
     } catch (error) {
       logger.error(

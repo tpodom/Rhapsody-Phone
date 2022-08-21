@@ -5,23 +5,23 @@ const { db } = require("../init");
  *
  * @return {Promise<object>} Current value of GoTo Connect settings
  */
-exports.getSettings = async () => {
+async function getSettingsData() {
   const settingsSnap = await getSettingsDoc().get();
 
   if (settingsSnap.exists) {
     return settingsSnap.data();
   }
   return {};
-};
+}
 
 /**
  * Removes GoTo Connect settings
  *
  * @return {Promise<void>}
  */
-exports.removeSettings = async () => {
+async function removeSettings() {
   return getSettingsDoc().delete();
-};
+}
 
 /**
  * Saves the GoTo account key to GoTo settings.
@@ -29,10 +29,10 @@ exports.removeSettings = async () => {
  * @param {string} accountKey GoTo account key
  * @return {Promise<object>} Modified settings
  */
-exports.updateAccount = async (accountKey) => {
+async function updateAccount(accountKey) {
   getSettingsDoc().set({ accountKey }, { merge: true });
-  return exports.getSettings();
-};
+  return getSettingsData();
+}
 
 /**
  * Saves the GoTo Connect notification channel id
@@ -40,10 +40,10 @@ exports.updateAccount = async (accountKey) => {
  * @param {string} channelId GoTo Connect notification channel id
  * @return {Promise<object>} Modified settings
  */
-exports.updateChannelId = async (channelId) => {
+async function updateChannelId(channelId) {
   getSettingsDoc().set({ channelId }, { merge: true });
-  return exports.getSettings();
-};
+  return getSettingsData();
+}
 
 /**
  * Saves the GoTo Connect notification session urls
@@ -52,10 +52,10 @@ exports.updateChannelId = async (channelId) => {
  * @param {string} subscriptionsUrl GoTo Connect notification session subscriptions url
  * @return {Promise<object>} Modified settings
  */
-exports.updateSessionUrls = async (sessionUrl, subscriptionsUrl) => {
+async function updateSessionUrls(sessionUrl, subscriptionsUrl) {
   getSettingsDoc().set({ sessionUrl, subscriptionsUrl }, { merge: true });
-  return exports.getSettings();
-};
+  return getSettingsData();
+}
 
 /**
  * Updates the last sync time for GoTo Connect.
@@ -63,10 +63,10 @@ exports.updateSessionUrls = async (sessionUrl, subscriptionsUrl) => {
  * @param {DateTime} lastSyncTime Last sync time
  * @return {Promise<object>} Updated settings
  */
-exports.updateLastSyncTime = async (lastSyncTime) => {
+async function updateLastSyncTime(lastSyncTime) {
   await getSettingsDoc().set({ lastSyncTime }, { merge: true });
-  return exports.getSettings();
-};
+  return getSettingsData();
+}
 /**
  * Builds reference to GoTo settings document.
  *
@@ -75,3 +75,10 @@ exports.updateLastSyncTime = async (lastSyncTime) => {
 function getSettingsDoc() {
   return db.collection("settings").doc("gotoConnect");
 }
+
+exports.getSettingsData = getSettingsData;
+exports.removeSettings = removeSettings;
+exports.updateAccount = updateAccount;
+exports.updateChannelId = updateChannelId;
+exports.updateSessionUrls = updateSessionUrls;
+exports.updateLastSyncTime = updateLastSyncTime;
