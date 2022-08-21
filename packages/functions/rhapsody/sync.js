@@ -17,9 +17,10 @@ exports.sync = functions
   });
 
 exports.syncTask = functions
-  .runWith({ secrets: ["RHAPSODY_API_KEY"] })
+  .runWith({ secrets: ["RHAPSODY_API_KEY"], timeoutSeconds: 540 })
   .pubsub.schedule("15 6,18 * * *")
   .timeZone("America/New_York")
   .onRun(async (context) => {
+    logger.debug(process.env);
     return sync(process.env.RHAPSODY_API_KEY);
   });
