@@ -16,6 +16,11 @@ const IGNORED_APPOINTMENT_TYPES = ["OTC Sale"];
  * @return {Promise<void>}
  */
 exports.sync = async (apiKey) => {
+  if (!apiKey) {
+    logger.error("Rhapsody API Key is empty, cannot run sync.");
+    return;
+  }
+
   const client = createClient(apiKey);
   let settings = await getSettingsData();
 
