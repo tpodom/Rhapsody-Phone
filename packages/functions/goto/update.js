@@ -15,3 +15,16 @@ exports.update = functions
     }
     return true;
   });
+
+exports.updateTask = functions
+  .runWith({ secrets: ["GOTO_WEBHOOK_SECRET"] })
+  .pubsub.schedule("15 6,18 * * *")
+  .timeZone("America/New_York")
+  .onRun(async (context) => {
+    try {
+      return await updateWebhooks();
+    } catch (err) {
+      logger.error(err);
+      throw err;
+    }
+  });
