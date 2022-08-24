@@ -59,7 +59,7 @@ jobs:
       - run: npm run build
       - run: npm run test
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@631cc914bfd7e97fdd4097e88f3ade8735d4285b
+        uses: w9jds/firebase-action@v2.2.2
         with:
           args: deploy -f
         env:
