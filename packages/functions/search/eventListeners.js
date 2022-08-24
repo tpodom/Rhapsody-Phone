@@ -6,7 +6,6 @@ const { indexDocumentChange } = require("../lib/typesense/handler");
 exports.searchMessagesListener = functions
   .runWith({
     timeoutSeconds: 60,
-    secrets: ["TYPESENSE_API_KEY"],
   })
   .firestore.document("conversations/{conversationId}/messages/{messageId}")
   .onWrite(async (change, context) => {
@@ -21,7 +20,6 @@ exports.searchMessagesListener = functions
 exports.searchClientsListener = functions
   .runWith({
     timeoutSeconds: 60,
-    secrets: ["TYPESENSE_API_KEY"],
   })
   .firestore.document("clients/{clientId}")
   .onWrite(async (change, context) => {

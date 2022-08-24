@@ -7,7 +7,7 @@ const clientsStore = require("../lib/db/clients");
 const messagingStore = require("../lib/db/messaging");
 
 exports.syncSearch = functions
-  .runWith({ secrets: ["TYPESENSE_API_KEY"], timeoutSeconds: 300, memory: "256MB" })
+  .runWith({ timeoutSeconds: 300, memory: "256MB" })
   .https.onCall(async (params, { auth }) => {
     validateIsAdmin(auth?.token);
 
