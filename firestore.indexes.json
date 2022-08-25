@@ -1,6 +1,20 @@
 {
   "indexes": [
     {
+      "collectionGroup": "call_queue",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "caller.phoneNumber",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "state",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "conversations",
       "queryScope": "COLLECTION",
       "fields": [
