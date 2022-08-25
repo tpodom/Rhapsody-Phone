@@ -65,7 +65,7 @@ function indexDocumentChange(collectionName, change, mapper) {
 
   if (change.before.data() == null) {
     // Create
-    const typesenseDocument = mapDocument(mapper(change.after));
+    const typesenseDocument = mapDocument(change.after, mapper);
     logger.debug(`Creating ${collectionName} document ${JSON.stringify(typesenseDocument)}`);
 
     return client
@@ -80,7 +80,7 @@ function indexDocumentChange(collectionName, change, mapper) {
     return client.collections(encodeURIComponent(collectionName)).documents(documentId).delete();
   } else {
     // Update
-    const typesenseDocument = mapDocument(mapper(change.after));
+    const typesenseDocument = mapDocument(change.after, mapper);
     logger.debug(`Upserting ${collectionName} document ${JSON.stringify(typesenseDocument)}`);
 
     return client
