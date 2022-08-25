@@ -11,22 +11,22 @@ const messaging = require("../../lib/messaging");
  */
 exports.incoming = async (webhookMessage) => {
   const { authorPhoneNumber, body, timestamp } = webhookMessage;
-  const normalizedPhoneNumber = normalizePhoneNumber(authorPhoneNumber) || authorPhoneNumber;
-
-  const conversationSnapshot = await messaging.pickConversationForMessage(normalizedPhoneNumber);
-  const messageData = {
-    id: generateId(),
-    conversationId: conversationSnapshot.id,
-    body,
-    timestamp: new Date(timestamp),
-    direction: "IN",
-    read: false,
-    client: conversationSnapshot.data().client,
-  };
 
   try {
+    const normalizedPhoneNumber = normalizePhoneNumber(authorPhoneNumber) || authorPhoneNumber;
+
+    const conversationSnapshot = await messaging.pickConversationForMessage(normalizedPhoneNumber);
+    const messageData = {
+      id: generateId(),
+      conversationId: conversationSnapshot.id,
+      body,
+      timestamp: new Date(timestamp),
+      direction: "IN",
+      read: false,
+      client: conversationSnapshot.data().client,
+    };
     await messagingStore.upsertMessage(conversationSnapshot.id, messageData);
   } catch (err) {
-    logger.error(`Error saving the received message from ${authorPhoneNumber}.`, err);
+    logger.error(`Error processing the received message from ${authorPhoneNumber}.`, err);
   }
 };
