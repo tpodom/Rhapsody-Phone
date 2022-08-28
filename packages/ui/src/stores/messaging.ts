@@ -12,7 +12,11 @@ import {
   QueryConstraint,
 } from "firebase/firestore";
 import { firestore } from "../lib/firebase/firestore";
-import { useFirestore } from "../composables/firestore";
+import {
+  FirestoreDocRefListener,
+  FirestoreQueryListener,
+  useFirestore,
+} from "../composables/firestore";
 import { computed, reactive, ref, Ref, watch } from "vue";
 import { functions, httpsCallable } from "../lib/firebase/functions";
 import LRU from "lru-cache";
@@ -32,8 +36,20 @@ export const useMessagingStore = defineStore("messaging", () => {
     ttl: 10 * 60000,
   };
 
-  const conversationCache = new LRU<string, Ref<Conversation | null | undefined>>(lruOptions);
-  const messagesCache = new LRU<string, Ref<Message[] | null | undefined>>(lruOptions);
+  const conversationCache = new LRU<string, FirestoreDocRefListener<Conversation>>({
+    ...lruOptions,
+    dispose(value: FirestoreDocRefListener<Conversation>) {
+      value.stop();
+    },
+  });
+
+  const messagesCache = new LRU<string, FirestoreQueryListener<Message>>({
+    ...lruOptions,
+    dispose(value: FirestoreQueryListener<Message>) {
+      value.stop();
+    },
+  });
+
   const filter: MessagesFilter = reactive({
     searchString: "",
     labels: [],
@@ -82,17 +98,14 @@ export const useMessagingStore = defineStore("messaging", () => {
 
   const getConversation = (id: string): Ref<Conversation | null | undefined> => {
     if (!conversationCache.has(id)) {
-      let conversationRef = ref<Conversation | null | undefined>();
-
-      if (!conversationRef.value) {
-        const docRef = doc(firestore, "conversations", id) as DocumentReference<Conversation>;
-        conversationRef = useFirestore<Conversation>(docRef).snapshot;
-      }
-
-      conversationCache.set(id, conversationRef);
+      const docRef = doc(firestore, "conversations", id) as DocumentReference<Conversation>;
+      const conversationListener = useFirestore<Conversation>(docRef, undefined, {
+        autoDispose: false,
+      });
+      conversationCache.set(id, conversationListener);
     }
 
-    return conversationCache.get(id)!;
+    return conversationCache.get(id)?.snapshot ?? ref<Conversation | null | undefined>();
   };
 
   const updateConversationLabels = async (
@@ -119,14 +132,16 @@ export const useMessagingStore = defineStore("messaging", () => {
         "messages",
       ) as CollectionReference<Message>;
 
-      const messagesRef = useFirestore<Message>(
+      const listener = useFirestore<Message>(
         query(collectionRef, orderBy("timestamp", "asc")),
-      ).snapshot;
+        undefined,
+        { autoDispose: false },
+      );
 
-      messagesCache.set(conversationId, messagesRef);
+      messagesCache.set(conversationId, listener);
     }
 
-    return messagesCache.get(conversationId)!;
+    return messagesCache.get(conversationId)?.snapshot ?? ref<Message[] | undefined>();
   };
 
   const sendMessage = async (

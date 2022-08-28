@@ -11,8 +11,13 @@ import {
   DocumentReference,
   Timestamp,
 } from "firebase/firestore";
-import { useFirestore } from "../composables/firestore";
+import {
+  useFirestore,
+  FirestoreDocRefListener,
+  FirestoreQueryListener,
+} from "../composables/firestore";
 import type { Ref } from "vue";
+import { ref } from "vue";
 import LRU from "lru-cache";
 import type { SearchResult } from "../types/search";
 import * as search from "../lib/search";
@@ -24,7 +29,7 @@ enum SortDirection {
 }
 
 function recentAppointmentQuery(
-  cache: LRU<string, Ref<Appointment[] | null | undefined>>,
+  cache: LRU<string, FirestoreQueryListener<Appointment>>,
   clientId: string,
   sortDirection: SortDirection,
 ): Ref<Appointment[] | null | undefined> {
@@ -45,10 +50,11 @@ function recentAppointmentQuery(
       limit(1),
     );
 
-    const { snapshot } = useFirestore<Appointment>(appointmentQuery);
-    cache.set(clientId, snapshot);
+    const listener = useFirestore<Appointment>(appointmentQuery, undefined, { autoDispose: false });
+    cache.set(clientId, listener);
   }
-  return cache.get(clientId)!;
+
+  return cache.get(clientId)?.snapshot ?? ref<Appointment[] | null | undefined>();
 }
 
 export const useClientsStore = defineStore("clients", () => {
@@ -56,18 +62,43 @@ export const useClientsStore = defineStore("clients", () => {
     max: 100,
     ttl: 10 * 60000,
   };
-  const clientCache = new LRU<string, Ref<Client | null | undefined>>(lruOptions);
-  const petCache = new LRU<string, Ref<Pet[] | null | undefined>>(lruOptions);
-  const lastAppointmentCache = new LRU<string, Ref<Appointment[] | null | undefined>>(lruOptions);
-  const nextAppointmentCache = new LRU<string, Ref<Appointment[] | null | undefined>>(lruOptions);
+
+  const clientCache = new LRU<string, FirestoreDocRefListener<Client>>({
+    ...lruOptions,
+    dispose(value: FirestoreDocRefListener<Client>) {
+      value.stop();
+    },
+  });
+
+  const petCache = new LRU<string, FirestoreQueryListener<Pet>>({
+    ...lruOptions,
+    dispose(value: FirestoreQueryListener<Pet>) {
+      value.stop();
+    },
+  });
+
+  const lastAppointmentCache = new LRU<string, FirestoreQueryListener<Appointment>>({
+    ...lruOptions,
+    dispose(value: FirestoreQueryListener<Appointment>) {
+      value.stop();
+    },
+  });
+
+  const nextAppointmentCache = new LRU<string, FirestoreQueryListener<Appointment>>({
+    ...lruOptions,
+    dispose(value: FirestoreQueryListener<Appointment>) {
+      value.stop();
+    },
+  });
 
   const getClient = (id: string): Ref<Client | null | undefined> => {
     if (!clientCache.has(id)) {
       const docRef = doc(firestore, "clients", id) as DocumentReference<Client>;
-      const { snapshot } = useFirestore<Client>(docRef);
-      clientCache.set(id, snapshot);
+      const listener = useFirestore<Client>(docRef, undefined, { autoDispose: false });
+      clientCache.set(id, listener);
     }
-    return clientCache.get(id)!;
+
+    return clientCache.get(id)?.snapshot ?? ref<Client | null | undefined>();
   };
 
   const getPets = (clientId: string): Ref<Pet[] | null | undefined> => {
@@ -76,10 +107,12 @@ export const useClientsStore = defineStore("clients", () => {
         doc(firestore, "clients", clientId),
         "pets",
       ) as CollectionReference<Pet>;
-      const { snapshot } = useFirestore<Pet>(petsRef);
-      petCache.set(clientId, snapshot);
+
+      const listener = useFirestore<Pet>(petsRef, undefined, { autoDispose: false });
+
+      petCache.set(clientId, listener);
     }
-    return petCache.get(clientId)!;
+    return petCache.get(clientId)?.snapshot ?? ref<Pet[] | null | undefined>();
   };
 
   const findLastAppointment = (clientId: string): Ref<Appointment[] | null | undefined> => {
