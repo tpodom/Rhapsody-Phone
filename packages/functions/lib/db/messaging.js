@@ -124,7 +124,7 @@ async function updateConversationAggregations(conversationId, messageBefore, mes
     transaction.update(conversationRef, {
       timestamp,
       errorCount,
-      unreadCount,
+      unreadCount: Math.max(unreadCount, 0),
       latestMessage: latestMessage || null,
     });
   });

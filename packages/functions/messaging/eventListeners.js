@@ -17,13 +17,25 @@ exports.messageListener = functions.firestore
     );
   });
 
-exports.messagingWebhookListener = functions.firestore
-  .document("messaging_webhook_events/{docId}")
-  .onCreate(async (event) => {
-    logger.info("Processing messaging webhook", event.data());
-    const messageData = event.data();
+exports.messagingWebhookListener = functions
+  .runWith({
+    failurePolicy: true,
+    timeoutSeconds: 540,
+  })
+  .firestore.document("messaging_webhook_events/{docId}")
+  .onCreate(async (snapshot, context) => {
+    const eventAgeMs = Date.now() - Date.parse(context.timestamp);
+
+    // If we've retried for 5 minutes then give up
+    if (eventAgeMs > 300000) {
+      logger.warn("Giving up trying to process message event", snapshot.data());
+      return;
+    }
+
+    logger.info("Processing messaging webhook", snapshot.data());
+    const messageData = snapshot.data();
 
     if (messageData.direction === "IN") {
-      incoming(messageData);
+      await incoming(snapshot);
     }
   });

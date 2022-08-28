@@ -2,7 +2,8 @@ const callQueueStore = require("../../lib/db/callQueue");
 const { normalizePhoneNumber } = require("../../lib/phone");
 const { logger } = require("../../lib/init");
 
-exports.hangup = async (data) => {
+exports.hangup = async (snapshot) => {
+  const data = snapshot.data();
   const normalizedNumber = normalizePhoneNumber(data.caller.number || data.caller.number);
   const activeCall = await callQueueStore.findActiveCall(normalizedNumber);
 
