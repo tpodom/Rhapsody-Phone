@@ -23,7 +23,11 @@
 
   <v-main>
     <div :style="mainStyles">
-      <v-container class="d-flex flex-column justify-center align-center" ref="messageContainer">
+      <v-container
+        fluid
+        class="d-flex flex-column justify-center align-center"
+        ref="messageContainer"
+      >
         <div v-if="conversationNotFound">
           The selected conversation was not found, perhaps it was deleted?
         </div>
