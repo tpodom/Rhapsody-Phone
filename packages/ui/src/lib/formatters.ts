@@ -59,3 +59,22 @@ export function formatRelativeAppointmentTime(
 export function formatFilenameDate(date: Date): string {
   return dayjs(date).format("YYYY-MM-DD");
 }
+
+export function formatFileSize(fileSize: number): string {
+  const sizes = [
+    { multiplier: 1024 * 1024 * 1024 * 1024, suffix: "TB", decimals: 1 },
+    { multiplier: 1024 * 1024 * 1024, suffix: "GB", decimals: 1 },
+    { multiplier: 1024 * 1024, suffix: "MB", decimals: 1 },
+    { multiplier: 1024, suffix: "KB", decimals: 0 },
+  ];
+
+  for (const size of sizes) {
+    const value = fileSize / size.multiplier;
+
+    if (Math.floor(value) > 0) {
+      return `${value.toFixed(size.decimals)} ${size.suffix}`;
+    }
+  }
+
+  return String(fileSize);
+}
